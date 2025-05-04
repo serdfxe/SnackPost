@@ -4,7 +4,7 @@ metadata:
   name: snackpost
   namespace: argocd
 spec:
-  project: snackpost
+  project: default
   source:
     repoURL: git@github.com:serdfxe/SnackPost.git
     targetRevision: HEAD
@@ -13,7 +13,7 @@ spec:
       recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: snackpost
   syncPolicy:
     automated:
       prune: true

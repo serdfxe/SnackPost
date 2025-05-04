@@ -17,7 +17,7 @@ spec:
       - name: ghcr-secret
       containers:
       - name: sp-scraper
-        image: ghcr.io/serdfxe/sp-scraper:master
+        image: ghcr.io/serdfxe/sp-scraper:latest
         ports:
         - containerPort: 8000
         livenessProbe:
