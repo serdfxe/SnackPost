@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sp-scraper
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sp-scraper
+  template:
+    metadata:
+      labels:
+        app: sp-scraper
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: sp-scraper
+        image: ghcr.io/serdfxe/sp-scraper:master
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10

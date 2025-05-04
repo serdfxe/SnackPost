@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sp-bot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sp-bot
+  template:
+    metadata:
+      labels:
+        app: sp-bot
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: sp-bot
+        image: ghcr.io/serdfxe/sp-bot:master
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10

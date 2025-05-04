@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sp-content-processing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sp-content-processing
+  template:
+    metadata:
+      labels:
+        app: sp-content-processing
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: sp-content-processing
+        image: ghcr.io/serdfxe/sp-content-processing:master
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
