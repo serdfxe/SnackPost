@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: snackpost-ingress
+  namespace: snackpost
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - bot.snackpost.ru
+    secretName: snackpost-tls-secret
+  rules:
+  - host: bot.snackpost.ru
+    http:
+      paths:
+      - path: /webhook(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: sp-bot
+            port:
+              number: 80
