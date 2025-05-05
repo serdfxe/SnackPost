@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-proxy-config
+  namespace: snackpost
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+
+    http {
+      server {
+        listen 8080;
+
+        # location /content-processing/ {
+        #   auth_request /check-subscription;
+        #   auth_request_set $user_id $upstream_http_x_user_id;
+
+        #   proxy_pass http://sp-content-processing.snackpost.svc.cluster.local:80/;
+        #   proxy_set_header X-User-Id $user_id;
+        # }
+
+        location /hello {
+          default_type text/plain;
+          return 200 "Hello!";
+        }
+
+        location /scraper/ {
+          auth_request /check-subscription;
+          auth_request_set $user_id $upstream_http_x_user_id;
+          proxy_pass http://sp-scraper.snackpost.svc.cluster.local:80/;
+          proxy_set_header X-User-Id $user_id;
+        }
+
+        location = /check-subscription {
+          internal;
+          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/auth/check-subscription;
+          proxy_pass_request_body off;
+          proxy_set_header Content-Length "";
+          proxy_set_header X-Original-URI $request_uri;
+          proxy_set_header X-Original-Method $request_method;
+          proxy_set_header X-User-Id $http_x_user_id;
+        }
+
+        location = /c {
+          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/auth/check-subscription;
+        }
+      }
+    }
