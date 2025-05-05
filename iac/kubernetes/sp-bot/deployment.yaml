@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: sp-bot
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sp-bot
@@ -25,7 +25,9 @@ spec:
               name: sp-bot-secrets
         env:
           - name: WEBHOOK_URL
-            value: "http://$(SP_BOT_SERVICE_IP):8000/webhook"
+            value: "https://bot.snackpost.ru/webhook/webhook"
+          - name: NGINX_PROXY_URL
+            value: "http://nginx-proxy.snackpost.svc.cluster.local:80"
         livenessProbe:
           httpGet:
             path: /health
