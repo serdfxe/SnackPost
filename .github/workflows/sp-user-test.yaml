@@ -1,0 +1,33 @@
+name: sp-user-test
+
+on:
+  pull_request:
+    paths:
+      - 'sp-user/**'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install lint dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black pytest
+          pip install -r requirements.txt
+
+      - name: Run black linting
+        run: black --check sp-user/
+
+      - name: Build Docker image
+        run: docker build -t sp-user-test -f iac/images/sp-user/Dockerfile .
+
+      - name: Run tests in Docker
+        run: docker run --rm sp-user-test pytest /app/sp-user/

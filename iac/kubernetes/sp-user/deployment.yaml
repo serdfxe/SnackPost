@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sp-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sp-user
+  template:
+    metadata:
+      labels:
+        app: sp-user
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: sp-user
+        image: ghcr.io/serdfxe/sp-user:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
