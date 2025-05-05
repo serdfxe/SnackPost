@@ -23,6 +23,9 @@ spec:
         envFrom:
           - secretRef:
               name: sp-bot-secrets
+        env:
+          - name: WEBHOOK_URL
+            value: "http://$(SP_BOT_SERVICE_IP):8000/webhook"
         livenessProbe:
           httpGet:
             path: /health

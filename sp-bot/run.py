@@ -39,6 +39,16 @@ async def webhook(request: Request) -> None:
     await dp.feed_update(bot, update)
 
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.ERROR,
