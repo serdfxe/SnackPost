@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:serdfxe/SnackPost.git
+    repoURL: https://github.com/serdfxe/SnackPost.git
     targetRevision: HEAD
     path: iac/kubernetes
     directory:
