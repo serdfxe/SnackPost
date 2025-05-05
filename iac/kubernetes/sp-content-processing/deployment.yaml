@@ -17,7 +17,7 @@ spec:
       - name: ghcr-secret
       containers:
       - name: sp-content-processing
-        image: ghcr.io/serdfxe/sp-content-processing:master
+        image: ghcr.io/serdfxe/sp-content-processing:latest
         ports:
         - containerPort: 8000
         livenessProbe:
