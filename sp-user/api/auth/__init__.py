@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 
 auth_router = APIRouter(
     prefix="/auth",
