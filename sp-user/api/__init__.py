@@ -1,4 +1,4 @@
-from api.scraper import user_router
+from api.auth import auth_router
 
 
 from fastapi import FastAPI
@@ -16,7 +16,7 @@ def init_cors(api: FastAPI) -> None:
 
 
 def init_routers(api: FastAPI) -> None:
-    api.include_router(user_router)
+    api.include_router(auth_router)
 
 
 def create_api() -> FastAPI:
