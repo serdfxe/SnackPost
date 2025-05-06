@@ -1,8 +1,11 @@
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+import logging
+
 from api.scraper import scraper_router
 
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from core.logging import setup_logging
 
 
 def init_cors(api: FastAPI) -> None:
@@ -35,6 +38,7 @@ def create_api() -> FastAPI:
 
 
 api = create_api()
+setup_logging()
 
 
 @api.get("/")
@@ -45,3 +49,17 @@ def read_root():
 @api.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@api.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger = logging.getLogger("api")
+    logger.info(f"Request: {request.method} {request.url}")
+
+    try:
+        response = await call_next(request)
+        logger.info(f"Response: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Error: {str(e)}", exc_info=True)
+        raise
