@@ -16,8 +16,7 @@ class SubscriptionResponseDTO(SubscriptionBase):
     id: UUID
 
 
-class SubscriptionCreateDTO(SubscriptionBase):
-    ...
+class SubscriptionCreateDTO(SubscriptionBase): ...
 
 
 class SubscriptionUpdateDTO(BaseModel):

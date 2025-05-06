@@ -53,29 +53,33 @@ async def get_subscription_route(
     Get subscription data for the user associated with the provided X-User-Id.
     """
     logger.info(f"Attempting to fetch subscription for user ID: {x_user_id}")
-    
+
     try:
         subscription = await repository.get(Subscription.user_id == x_user_id)
     except SQLAlchemyError as e:
-        logger.error(f"Database error while fetching subscription for user {x_user_id}: {str(e)}")
+        logger.error(
+            f"Database error while fetching subscription for user {x_user_id}: {str(e)}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+            detail="Database error occurred.",
         )
-        
+
     except Exception as e:
-        logger.error(f"Unexpected error while fetching subscription for user {x_user_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error while fetching subscription for user {x_user_id}: {str(e)}",
+            exc_info=True,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
+            detail="An unexpected error occurred.",
         )
-    
+
     if not subscription:
-            logger.warning(f"Subscription not found for user ID: {x_user_id}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Subscription not found."
-            )
+        logger.warning(f"Subscription not found for user ID: {x_user_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found."
+        )
 
     logger.info(f"Successfully retrieved subscription for user ID: {x_user_id}")
     return subscription
@@ -109,21 +113,23 @@ async def create_subscription_route(
         logger.warning(f"Subscription creation conflict: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Subscription already exists for this user."
+            detail="Subscription already exists for this user.",
         )
-    
+
     except SQLAlchemyError as e:
         logger.error(f"Database error during subscription creation: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+            detail="Database error occurred.",
         )
-    
+
     except Exception as e:
-        logger.error(f"Unexpected error during subscription creation: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error during subscription creation: {str(e)}", exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
+            detail="An unexpected error occurred.",
         )
 
 
@@ -151,28 +157,32 @@ async def update_subscription_route(
         if not subscription:
             logger.warning(f"Subscription not found for user ID: {x_user_id}")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Subscription not found."
+                status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found."
             )
 
         updated_data = data.model_dump(exclude_unset=True)
         updated_subscription = await repository.update(subscription.id, updated_data)
-        
+
         logger.info(f"Successfully updated subscription for user ID: {x_user_id}")
         return updated_subscription
 
     except SQLAlchemyError as e:
-        logger.error(f"Database error while updating subscription for user {x_user_id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+        logger.error(
+            f"Database error while updating subscription for user {x_user_id}: {str(e)}"
         )
-        
-    except Exception as e:
-        logger.error(f"Unexpected error while updating subscription for user {x_user_id}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
+            detail="Database error occurred.",
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Unexpected error while updating subscription for user {x_user_id}: {str(e)}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred.",
         )
 
 
@@ -198,8 +208,7 @@ async def delete_subscription_route(
         if not subscription:
             logger.warning(f"Subscription not found for user ID: {x_user_id}")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Subscription not found."
+                status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found."
             )
 
         deleted = await repository.delete(subscription.id)
@@ -207,24 +216,29 @@ async def delete_subscription_route(
             logger.error(f"Failed to delete subscription for user ID: {x_user_id}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to delete subscription."
+                detail="Failed to delete subscription.",
             )
 
         logger.info(f"Successfully deleted subscription for user ID: {x_user_id}")
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except SQLAlchemyError as e:
-        logger.error(f"Database error while deleting subscription for user {x_user_id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred while deleting subscription."
+        logger.error(
+            f"Database error while deleting subscription for user {x_user_id}: {str(e)}"
         )
-        
-    except Exception as e:
-        logger.error(f"Unexpected error while deleting subscription for user {x_user_id}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while deleting subscription."
+            detail="Database error occurred while deleting subscription.",
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Unexpected error while deleting subscription for user {x_user_id}: {str(e)}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while deleting subscription.",
         )
 
 
@@ -241,17 +255,23 @@ async def check_subscription_route(
     """
     try:
         subscription = await subs_repository.get(Subscription.user_id == x_user_id)
-        
+
         if not subscription or not subscription.is_active:
             return False
 
-        if subscription.expires_at and subscription.expires_at < datetime.now(timezone.utc):
+        if subscription.expires_at and subscription.expires_at < datetime.now(
+            timezone.utc
+        ):
             return False
 
-        response.headers["X-User-Id"] = str((await user_repository.get(User.user_id == x_user_id)).id)
+        response.headers["X-User-Id"] = str(
+            (await user_repository.get(User.user_id == x_user_id)).id
+        )
 
         return True
 
     except Exception as e:
-        logger.error(f"Error checking subscription for user {x_user_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Error checking subscription for user {x_user_id}: {str(e)}", exc_info=True
+        )
         return False

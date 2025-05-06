@@ -57,7 +57,7 @@ def health_check():
 async def log_requests(request: Request, call_next):
     logger = logging.getLogger("api")
     logger.info(f"Request: {request.method} {request.url}")
-    
+
     try:
         response = await call_next(request)
         logger.info(f"Response: {response.status_code}")
