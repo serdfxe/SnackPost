@@ -20,6 +20,7 @@ user_router = APIRouter(
 )
 logger = logging.getLogger(__name__)
 
+
 UserRepository = Annotated[
     DatabaseRepository[User],
     Depends(get_repository(User)),

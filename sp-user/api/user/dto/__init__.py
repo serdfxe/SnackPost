@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
@@ -11,8 +11,10 @@ class UserBase(BaseModel):
     class Config:
         from_attributes = True
 
+
 class UserResponseDTO(UserBase):
     id: UUID
+
 
 class UserCreateDTO(UserBase):
     ...

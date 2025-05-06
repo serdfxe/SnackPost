@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import logging
 
-from api.auth import auth_router
 from api.user import user_router
+from api.subscription import subscription_router
 
 from core.logging import setup_logging
 
@@ -20,8 +20,8 @@ def init_cors(api: FastAPI) -> None:
 
 
 def init_routers(api: FastAPI) -> None:
-    api.include_router(auth_router)
     api.include_router(user_router)
+    api.include_router(subscription_router)
 
 
 def create_api() -> FastAPI:
