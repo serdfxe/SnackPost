@@ -12,5 +12,3 @@ async def scrape_article_route(x_user_id: Annotated[int, Header()],) -> bool:
     """
     Check subscription by user id
     """
-
-    return True
