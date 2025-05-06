@@ -1,8 +1,12 @@
-from api.auth import auth_router
-
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+
+import logging
+
+from api.user import user_router
+from api.subscription import subscription_router
+
+from core.logging import setup_logging
 
 
 def init_cors(api: FastAPI) -> None:
@@ -16,7 +20,8 @@ def init_cors(api: FastAPI) -> None:
 
 
 def init_routers(api: FastAPI) -> None:
-    api.include_router(auth_router)
+    api.include_router(user_router)
+    api.include_router(subscription_router)
 
 
 def create_api() -> FastAPI:
@@ -35,6 +40,7 @@ def create_api() -> FastAPI:
 
 
 api = create_api()
+setup_logging()
 
 
 @api.get("/")
@@ -45,3 +51,17 @@ def read_root():
 @api.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@api.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger = logging.getLogger("api")
+    logger.info(f"Request: {request.method} {request.url}")
+    
+    try:
+        response = await call_next(request)
+        logger.info(f"Response: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Error: {str(e)}", exc_info=True)
+        raise
