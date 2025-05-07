@@ -1,5 +1,9 @@
+from .content import content_router
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from core.logging import setup_logging
 
 
 def init_cors(api: FastAPI) -> None:
@@ -13,7 +17,7 @@ def init_cors(api: FastAPI) -> None:
 
 
 def init_routers(api: FastAPI) -> None:
-    ...
+    api.include_router(content_router)
 
 
 def create_api() -> FastAPI:
@@ -32,6 +36,7 @@ def create_api() -> FastAPI:
 
 
 api = create_api()
+setup_logging()
 
 
 @api.get("/")
