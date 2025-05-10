@@ -30,7 +30,7 @@ async def scrape_article_route(url: str) -> ScraperResponse:
         client = ZenRowsClient(ZENROWS_TOKEN)
         params = {
             "js_render": "true", 
-            "wait": "10000", 
+            "wait": "15000", 
             "response_type": "markdown"
         }
 
