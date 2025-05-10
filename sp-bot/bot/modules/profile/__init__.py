@@ -73,18 +73,18 @@ async def handle_check_subscription(callback: CallbackQuery):
             )
             
         # Show payment options if no active subscription
-        if not has_subscription:
-            builder = InlineKeyboardBuilder()
-            builder.button(text="1 месяц - 299₽", callback_data="sub_1_month")
-            builder.button(text="3 месяца - 799₽", callback_data="sub_3_months")
-            builder.button(text="1 год - 2999₽", callback_data="sub_1_year")
-            builder.adjust(1)
+        # if not has_subscription:
+        #     builder = InlineKeyboardBuilder()
+        #     builder.button(text="1 месяц - 299₽", callback_data="sub_1_month")
+        #     builder.button(text="3 месяца - 799₽", callback_data="sub_3_months")
+        #     builder.button(text="1 год - 2999₽", callback_data="sub_1_year")
+        #     builder.adjust(1)
             
-            await callback.message.answer(
-                PAYMENT_OPTIONS_MSG,
-                reply_markup=builder.as_markup(),
-                parse_mode="HTML"
-            )
+        #     await callback.message.answer(
+        #         PAYMENT_OPTIONS_MSG,
+        #         reply_markup=builder.as_markup(),
+        #         parse_mode="HTML"
+        #     )
             
     except Exception as e:
         logger.error(f"Error in handle_check_subscription: {e}", exc_info=True)
