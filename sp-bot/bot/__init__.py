@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher
 from bot.modules.start import start_router
 from bot.modules.summary import summary_router
 from bot.modules.admin import admin_router
+from bot.modules.profile import profile_router
 
 from core.config import MASTER_ID, API_TOKEN
 
@@ -14,6 +15,7 @@ def create_dp() -> Dispatcher:
         start_router,
         summary_router,
         admin_router,
+        profile_router,
     )
 
     return dp
