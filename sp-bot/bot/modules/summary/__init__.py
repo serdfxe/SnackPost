@@ -12,7 +12,7 @@ from core.sp_clients.sp_content_processing.content_processing_service_client.mod
     GenerationRequest,
     Message as SPMessage
 )
-from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape_article_route_scraper_scrape_post
+from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape_article_route_scraper_scrape_get
 from core.sp_clients.sp_content_processing.content_processing_service_client.api.content import generate_content_content_generate_system_content_router_post
 
 from bot.filters.subscription import IsSubscribed
@@ -182,13 +182,20 @@ async def process_url(message: Message, url: str, state: FSMContext):
 async def fetch_article_text(url: str) -> str:
     """Fetch article content using scraping service"""
     try:
-        response = await scrape_article_route_scraper_scrape_post.asyncio(
+        response = await scrape_article_route_scraper_scrape_get.asyncio(
             client=scraper_client,
             url_query=url
         )
-        if not response or not response.content:
-            raise ValueError("Не удалось получить текст статьи")
-        return response.content
+        if isinstance(response, dict):
+            if not response or not response["content"]:
+                raise ValueError("Не удалось получить текст статьи")
+            
+            return response["content"]
+        else:
+            if not response or not response.content:
+                raise ValueError("Не удалось получить текст статьи")
+            
+            return response.content
     except Exception as e:
         logger.error(f"Error fetching article text: {e}", exc_info=True)
         raise
