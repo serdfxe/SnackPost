@@ -20,6 +20,9 @@ spec:
         image: ghcr.io/serdfxe/sp-content-processing:latest
         ports:
         - containerPort: 8000
+        envFrom:
+          - secretRef:
+            name: sp-content-processing-secrets
         livenessProbe:
           httpGet:
             path: /health
