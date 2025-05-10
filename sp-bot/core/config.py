@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-ADMIN_ID: int = int(os.getenv("ADMIN_ID"))
+MASTER_ID: int = int(os.getenv("MASTER_ID"))
+ADMINS: set[int] = set([int(i) for i in os.getenv("ADMINS", str(MASTER_ID)).strip().replace(" ", "").split(",")])
 API_TOKEN: str = os.getenv("API_TOKEN")
 WEBHOOK_URL: str = os.getenv("WEBHOOK_URL")
 PROXY_URL: str = os.getenv("PROXY_URL", "http://nginx-proxy.snackpost.svc.cluster.local:80")

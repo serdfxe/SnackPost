@@ -2,8 +2,9 @@ from aiogram import Bot, Dispatcher
 
 from bot.modules.start import start_router
 from bot.modules.summary import summary_router
+from bot.modules.admin import admin_router
 
-from core.config import ADMIN_ID, API_TOKEN
+from core.config import MASTER_ID, API_TOKEN
 
 
 def create_dp() -> Dispatcher:
@@ -12,6 +13,7 @@ def create_dp() -> Dispatcher:
     dp.include_routers(
         start_router,
         summary_router,
+        admin_router,
     )
 
     return dp
@@ -20,7 +22,7 @@ def create_dp() -> Dispatcher:
 async def main():
     bot = Bot(token=API_TOKEN)
 
-    await bot.send_message(ADMIN_ID, "START!!!")
+    await bot.send_message(MASTER_ID, "START!!!")
 
     dp = create_dp()
 

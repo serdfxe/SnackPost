@@ -15,6 +15,8 @@ from core.sp_clients.sp_content_processing.content_processing_service_client.mod
 from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape_article_route_scraper_scrape_post
 from core.sp_clients.sp_content_processing.content_processing_service_client.api.content import generate_content_content_generate_system_content_router_post
 
+from bot.filters.subscription import IsSubscribed
+
 
 logger = logging.getLogger(__name__)
 summary_router = Router(name="summary_router")
@@ -26,7 +28,7 @@ class SummaryStates(StatesGroup):
 
 user_contexts = {}
 
-@summary_router.message(Command("summarize", "s"))
+@summary_router.message(Command("summarize", "s"), IsSubscribed())
 async def handle_summary_command(message: Message, state: FSMContext):
     """Handle the summarize command with optional URL parameter"""
     try:
