@@ -22,7 +22,7 @@ spec:
         - containerPort: 8000
         envFrom:
           - secretRef:
-            name: sp-content-processing-secrets
+              name: sp-content-processing-secrets
         livenessProbe:
           httpGet:
             path: /health
