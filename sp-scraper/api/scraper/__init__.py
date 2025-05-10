@@ -1,10 +1,14 @@
 from fastapi import APIRouter
 
+from fastapi_cache.decorator import cache
+
 import logging
 
 from zenrows import ZenRowsClient
 
 from core.config import ZENROWS_TOKEN
+
+from .dto import ScraperResponse
 
 
 scraper_router = APIRouter(
@@ -14,8 +18,10 @@ scraper_router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
+
 @scraper_router.post("/scrape")
-async def scrape_article_route(url: str) -> str:
+@cache(expire=89280)
+async def scrape_article_route(url: str) -> ScraperResponse:
     """
     Parse article by URL.
     """
@@ -39,7 +45,8 @@ async def scrape_article_route(url: str) -> str:
             )
 
         logger.info(f"Successfully scraped URL: {url}")
-        return response.text
+        cache[url] = response.text
+        return ScraperResponse(content=response.text)
 
     except Exception as e:
         logger.error(f"Error scraping URL {url}: {str(e)}", exc_info=True)
@@ -47,3 +54,7 @@ async def scrape_article_route(url: str) -> str:
             status_code=500,
             detail=f"Scraping failed: {str(e)}",
         )
+
+@scraper_router.post("/cache")
+async def scrape_cache_route() -> dict:
+    return cache

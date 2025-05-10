@@ -2,18 +2,30 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 
 
-class GenerationRequest(BaseModel):
-    messages: List[Dict[str, str]]
-    variables: Optional[Dict[str, str]] = None
+class Message(BaseModel):
+    role: str
+    content: str
 
+class Variable(BaseModel):
+    name: str
+    value: str
+
+class GenerationRequest(BaseModel):
+    messages: List[Message]
+    variables: Optional[List[Variable]] = None
+
+
+class Usage(BaseModel):
+    prompt_tokens: int
+    completion_tokens: int
 
 class GenerationResponse(BaseModel):
     content: str
-    usage: Dict[str, int]
+    usage: Usage
 
 
 class EditRequest(BaseModel):
-    current_context: List[Dict[str, str]]
+    current_context: List[Message]
     user_message: str
 
 

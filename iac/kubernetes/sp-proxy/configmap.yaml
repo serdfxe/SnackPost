@@ -12,29 +12,28 @@ data:
       server {
         listen 8080;
 
-        # location /content-processing/ {
-        #   auth_request /check-subscription;
-        #   auth_request_set $user_id $upstream_http_x_user_id;
-
-        #   proxy_pass http://sp-content-processing.snackpost.svc.cluster.local:80/;
-        #   proxy_set_header X-User-Id $user_id;
-        # }
-
         location /hello {
           default_type text/plain;
           return 200 "Hello!";
         }
 
         location /scraper/ {
-          auth_request /check-subscription;
+          auth_request /subscription/check;
           auth_request_set $user_id $upstream_http_x_user_id;
           proxy_pass http://sp-scraper.snackpost.svc.cluster.local:80/;
           proxy_set_header X-User-Id $user_id;
         }
 
-        location = /check-subscription {
+        location /content-processing/ {
+          auth_request /subscription/check;
+          auth_request_set $user_id $upstream_http_x_user_id;
+          proxy_pass http://sp-content-processing.snackpost.svc.cluster.local:80/;
+          proxy_set_header X-User-Id $user_id;
+        }
+
+        location = /subscription/check {
           internal;
-          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/auth/check-subscription;
+          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/subscription/check;
           proxy_pass_request_body off;
           proxy_set_header Content-Length "";
           proxy_set_header X-Original-URI $request_uri;
@@ -42,8 +41,8 @@ data:
           proxy_set_header X-User-Id $http_x_user_id;
         }
 
-        location = /c {
-          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/auth/check-subscription;
+        location /user/ {
+          proxy_pass http://sp-user.snackpost.svc.cluster.local:80/;
         }
       }
     }

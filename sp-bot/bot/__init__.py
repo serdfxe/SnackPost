@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher
 
 from bot.modules.start import start_router
+from bot.modules.summary import summary_router
 
 from core.config import ADMIN_ID, API_TOKEN
 
@@ -10,6 +11,7 @@ def create_dp() -> Dispatcher:
 
     dp.include_routers(
         start_router,
+        summary_router,
     )
 
     return dp

@@ -20,6 +20,9 @@ spec:
         image: ghcr.io/serdfxe/sp-user:latest
         ports:
         - containerPort: 8000
+        envFrom:
+          - secretRef:
+            name: sp-user-secrets
         livenessProbe:
           httpGet:
             path: /health

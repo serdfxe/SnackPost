@@ -9,7 +9,7 @@ from .prompts import summary
 from .dto import (
     GenerationRequest,
     GenerationResponse,
-    EditRequest,
+    Usage,
     PromptTemplate,
 )
 
@@ -45,10 +45,11 @@ async def generate_content(
 
         system_prompt = template.system_prompt
         if request.variables:
-            for key, value in request.variables.items():
+            for var in request.variables.items():
+                key, value = var.key, var.value
                 system_prompt = system_prompt.replace(f"{{{key}}}", value)
 
-        messages = [{"role": "system", "content": system_prompt}] + request.messages
+        messages = [{"role": "system", "content": system_prompt}] + [i.model_dump() for i in request.messages]
 
         completion = client.chat.completions.create(
             model=template.model,
@@ -59,10 +60,10 @@ async def generate_content(
 
         return GenerationResponse(
             content=completion.choices[0].message.reasoning,
-            usage={
-                "prompt_tokens": completion.usage.prompt_tokens,
-                "completion_tokens": completion.usage.completion_tokens,
-            },
+            usage=Usage(
+                prompt_tokens=completion.usage.prompt_tokens,
+                completion_tokens=completion.usage.completion_tokens,
+            ),
         )
 
     except Exception as e:
