@@ -47,7 +47,7 @@ async def handle_summary_command(message: Message, state: FSMContext):
         await message.answer("⚠️ Ошибка при обработке команды")
 
 @summary_router.message(Command("summarize", "s"), ~IsSubscribed())
-async def handle_summary_command(message: Message, state: FSMContext):
+async def handle_summary_command_not_sub(message: Message, state: FSMContext):
     """Handle the summarize command with optional URL parameter"""
     await message.answer(SUBSCRIPTION_REQUIRED_MSG, parse_mode="HTML")
 
