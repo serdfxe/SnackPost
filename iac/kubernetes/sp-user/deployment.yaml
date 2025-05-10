@@ -22,7 +22,7 @@ spec:
         - containerPort: 8000
         envFrom:
           - secretRef:
-            name: sp-user-secrets
+              name: sp-user-secrets
         livenessProbe:
           httpGet:
             path: /health
