@@ -7,13 +7,13 @@
   },
   "paths": {
     "/scraper/scrape": {
-      "post": {
+      "get": {
         "tags": [
           "scraper"
         ],
         "summary": "Scrape Article Route",
         "description": "Parse article by URL.",
-        "operationId": "scrape_article_route_scraper_scrape_post",
+        "operationId": "scrape_article_route_scraper_scrape_get",
         "parameters": [
           {
             "name": "url",
@@ -31,7 +31,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ScraperResponse"
+
                 }
               }
             }
@@ -42,29 +42,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/scraper/cache": {
-      "post": {
-        "tags": [
-          "scraper"
-        ],
-        "summary": "Scrape Cache Route",
-        "operationId": "scrape_cache_route_scraper_cache_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Scrape Cache Route Scraper Cache Post"
                 }
               }
             }
@@ -123,19 +100,6 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
-      },
-      "ScraperResponse": {
-        "properties": {
-          "content": {
-            "type": "string",
-            "title": "Content"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content"
-        ],
-        "title": "ScraperResponse"
       },
       "ValidationError": {
         "properties": {

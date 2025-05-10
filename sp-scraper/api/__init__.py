@@ -31,6 +31,13 @@ def init_routers(api: FastAPI) -> None:
     api.include_router(scraper_router)
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    redis = aioredis.from_url(REDIS_URL)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
+
 def create_api() -> FastAPI:
     api = FastAPI(
         title="Scraper Service",
@@ -38,6 +45,7 @@ def create_api() -> FastAPI:
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     init_routers(api=api)
@@ -72,10 +80,3 @@ async def log_requests(request: Request, call_next):
     except Exception as e:
         logger.error(f"Error: {str(e)}", exc_info=True)
         raise
-
-
-@asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url(REDIS_URL)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    yield

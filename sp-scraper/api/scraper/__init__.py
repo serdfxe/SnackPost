@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from fastapi_cache.decorator import cache
 
@@ -18,8 +18,7 @@ scraper_router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
-
-@scraper_router.post("/scrape")
+@scraper_router.get("/scrape")
 @cache(expire=89280)
 async def scrape_article_route(url: str) -> ScraperResponse:
     """
@@ -45,7 +44,6 @@ async def scrape_article_route(url: str) -> ScraperResponse:
             )
 
         logger.info(f"Successfully scraped URL: {url}")
-        cache[url] = response.text
         return ScraperResponse(content=response.text)
 
     except Exception as e:
@@ -54,7 +52,3 @@ async def scrape_article_route(url: str) -> ScraperResponse:
             status_code=500,
             detail=f"Scraping failed: {str(e)}",
         )
-
-@scraper_router.post("/cache")
-async def scrape_cache_route() -> dict:
-    return cache
