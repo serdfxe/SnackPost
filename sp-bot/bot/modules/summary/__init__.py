@@ -15,6 +15,8 @@ from core.sp_clients.sp_content_processing.content_processing_service_client.mod
 from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape_article_route_scraper_scrape_get
 from core.sp_clients.sp_content_processing.content_processing_service_client.api.content import generate_content_content_generate_system_content_router_post
 
+from core.messages import SUBSCRIPTION_REQUIRED_MSG
+
 from bot.filters.subscription import IsSubscribed
 
 
@@ -43,6 +45,11 @@ async def handle_summary_command(message: Message, state: FSMContext):
     except Exception as e:
         logger.error(f"Error in handle_summary_command: {e}", exc_info=True)
         await message.answer("⚠️ Ошибка при обработке команды")
+
+@summary_router.message(Command("summarize", "s"), ~IsSubscribed())
+async def handle_summary_command(message: Message, state: FSMContext):
+    """Handle the summarize command with optional URL parameter"""
+    await message.answer(SUBSCRIPTION_REQUIRED_MSG, parse_mode="HTML")
 
 @summary_router.message(SummaryStates.waiting_for_url, F.text & ~F.text.startswith("/"))
 async def handle_url_input(message: Message, state: FSMContext):
