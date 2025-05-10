@@ -14,7 +14,7 @@ start_router = Router(name="start_router")
 
 @start_router.message(Command("start"))
 async def registered_start_message_handler(message: Message, bot: Bot):
-    await message.answer(HELLO_MSG)
+    await message.answer(HELLO_MSG, parse_mode="HTML")
 
     username = (
         message.from_user.username.replace("_", "\\_")

@@ -59,7 +59,7 @@ async def handle_url_input(message: Message, state: FSMContext):
         await message.answer("⚠️ Ошибка при обработке ссылки")
         await state.clear()
 
-@summary_router.message(SummaryStates.waiting_for_edit)
+@summary_router.message(SummaryStates.waiting_for_edit, F.text & ~F.text.startswith("/"))
 async def handle_edit_mode(message: Message, state: FSMContext):
     """Handle user edits to the generated summary"""
     try:
