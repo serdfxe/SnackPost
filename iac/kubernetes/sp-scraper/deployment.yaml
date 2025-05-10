@@ -20,6 +20,9 @@ spec:
         image: ghcr.io/serdfxe/sp-scraper:latest
         ports:
         - containerPort: 8000
+        envFrom:
+          - secretRef:
+              name: sp-scraper-secrets
         livenessProbe:
           httpGet:
             path: /health
