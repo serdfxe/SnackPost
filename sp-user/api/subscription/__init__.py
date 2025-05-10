@@ -202,7 +202,7 @@ async def delete_subscription_route(
                 detail="Subscription not found."
             )
 
-        deleted = await repository.delete(subscription.id)
+        deleted = await repository.delete(Subscription.id == subscription.id)
         if not deleted:
             logger.error(f"Failed to delete subscription for user ID: {x_user_id}")
             raise HTTPException(
