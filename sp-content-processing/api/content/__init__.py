@@ -62,7 +62,7 @@ async def generate_content(
         logger.info(f"CONTENT: \n\n{completion.choices[0].message.content}\n\n")
 
         return GenerationResponse(
-            content=completion.choices[0].message.reasoning,
+            content=completion.choices[0].message.reasoning if not completion.choices[0].message.content else completion.choices[0].message.content,
             usage=Usage(
                 prompt_tokens=completion.usage.prompt_tokens,
                 completion_tokens=completion.usage.completion_tokens,
