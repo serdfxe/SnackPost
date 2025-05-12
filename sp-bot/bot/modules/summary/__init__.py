@@ -1,5 +1,4 @@
 import asyncio
-
 from aiogram import Bot, Router, F
 from aiogram.types import Message
 from aiogram.filters.state import State, StatesGroup
@@ -16,9 +15,9 @@ from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape
 from core.sp_clients.sp_content_processing.content_processing_service_client.api.content import generate_content_content_generate_system_content_router_post
 
 from core.messages import SUBSCRIPTION_REQUIRED_MSG
+from core.config import MASTER_ID
 
 from bot.filters.subscription import IsSubscribed
-
 
 logger = logging.getLogger(__name__)
 summary_router = Router(name="summary_router")
@@ -30,15 +29,32 @@ class SummaryStates(StatesGroup):
 
 user_contexts = {}
 
+async def notify_admin(bot: Bot, message: Message, action: str, details: str = ""):
+    """Send notification to admin about user action"""
+    try:
+        if MASTER_ID:
+            user = message.from_user
+            text = (f"👤 <b>User action</b>\n"
+                   f"ID: {user.id}\n"
+                   f"Name: {user.full_name}\n"
+                   f"Username: @{user.username}\n"
+                   f"Action: {action}\n"
+                   f"Details: {details}")
+            await bot.send_message(MASTER_ID, text, parse_mode="HTML")
+    except Exception as e:
+        logger.error(f"Error sending admin notification: {e}")
+
 @summary_router.message(Command("summarize", "s"), IsSubscribed())
-async def handle_summary_command(message: Message, state: FSMContext):
+async def handle_summary_command(message: Message, state: FSMContext, bot: Bot):
     """Handle the summarize command with optional URL parameter"""
     try:
         args = message.text.split(maxsplit=1)
         
         if len(args) > 1 and is_valid_url(args[1]):
-            await process_url(message, args[1], state)
+            await notify_admin(bot, message, "Started summary with URL", args[1])
+            await process_url(message, args[1], state, bot)
         else:
+            await notify_admin(bot, message, "Started summary without URL")
             await message.answer("📝 Отправьте ссылку на статью:")
             await state.set_state(SummaryStates.waiting_for_url)
             
@@ -47,19 +63,21 @@ async def handle_summary_command(message: Message, state: FSMContext):
         await message.answer("⚠️ Ошибка при обработке команды")
 
 @summary_router.message(Command("summarize", "s"), ~IsSubscribed())
-async def handle_summary_command_not_sub(message: Message, state: FSMContext):
-    """Handle the summarize command with optional URL parameter"""
+async def handle_summary_command_not_sub(message: Message, state: FSMContext, bot: Bot):
+    """Handle the summarize command when not subscribed"""
+    await notify_admin(bot, message, "Tried to use summary without subscription")
     await message.answer(SUBSCRIPTION_REQUIRED_MSG, parse_mode="HTML")
 
 @summary_router.message(SummaryStates.waiting_for_url, F.text & ~F.text.startswith("/"))
-async def handle_url_input(message: Message, state: FSMContext):
+async def handle_url_input(message: Message, state: FSMContext, bot: Bot):
     """Process user-provided URL for article scraping"""
     try:
         if not is_valid_url(message.text):
             await message.reply("⚠️ Неверный формат ссылки. Попробуйте еще раз:")
             return
         
-        await process_url(message, message.text, state)
+        await notify_admin(bot, message, "Submitted URL for summary", message.text)
+        await process_url(message, message.text, state, bot)
         
     except Exception as e:
         logger.error(f"Error in handle_url_input: {e}", exc_info=True)
@@ -67,7 +85,7 @@ async def handle_url_input(message: Message, state: FSMContext):
         await state.clear()
 
 @summary_router.message(SummaryStates.waiting_for_edit, F.text & ~F.text.startswith("/"))
-async def handle_edit_mode(message: Message, state: FSMContext):
+async def handle_edit_mode(message: Message, state: FSMContext, bot: Bot):
     """Handle user edits to the generated summary"""
     try:
         user_id = message.from_user.id
@@ -77,6 +95,8 @@ async def handle_edit_mode(message: Message, state: FSMContext):
             await message.answer("❌ Сессия устарела. Начните заново с /s")
             await state.clear()
             return
+        
+        await notify_admin(bot, message, "Edited summary", f"Original URL: {context['url']}\nEdit: {message.text}")
         
         context['messages'].append({
             "role": "user",
@@ -113,7 +133,7 @@ async def handle_edit_mode(message: Message, state: FSMContext):
         logger.error(f"Error in handle_edit_mode: {e}", exc_info=True)
         await message.answer(f"⚠️ Ошибка при обновлении выжимки")
 
-async def process_url(message: Message, url: str, state: FSMContext):
+async def process_url(message: Message, url: str, state: FSMContext, bot: Bot):
     """Process article URL and generate initial summary"""
     try:
         progress_msg = await message.reply(
@@ -180,6 +200,14 @@ async def process_url(message: Message, url: str, state: FSMContext):
         
         await mess.reply("✏️ Напишите свои правки текстом, и я адаптирую выжимку.")
         await state.set_state(SummaryStates.waiting_for_edit)
+        
+        # Notify admin about successful summary generation
+        await notify_admin(
+            bot, 
+            message, 
+            "Generated summary", 
+            f"URL: {url}\nLength: {len(article_text)} chars\nSummary length: {len(response.content)} chars"
+        )
         
     except Exception as e:
         logger.error(f"Error in process_url: {e}", exc_info=True)
