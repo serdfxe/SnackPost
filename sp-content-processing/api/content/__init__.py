@@ -58,8 +58,9 @@ async def generate_content(
             max_tokens=template.max_tokens,
         )
 
-        logger.info(f"REASONING: \n\n{completion.choices[0].message.reasoning}\n\n")
-        logger.info(f"CONTENT: \n\n{completion.choices[0].message.content}\n\n")
+        logger.info(f"\n\n{completion.choices[0].message.__repr__()}\n\n")
+        # logger.info(f"REASONING: \n\n{completion.choices[0].message.reasoning}\n\n")
+        # logger.info(f"CONTENT: \n\n{completion.choices[0].message.content}\n\n")
 
         return GenerationResponse(
             content=completion.choices[0].message.reasoning if not completion.choices[0].message.content else completion.choices[0].message.content,
