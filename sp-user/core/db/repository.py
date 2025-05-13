@@ -3,6 +3,8 @@ from typing import Generic, TypeVar
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.engine import Result
+from sqlalchemy.sql.expression import BinaryExpression
 
 from core.db import Base
 
@@ -32,11 +34,30 @@ class DatabaseRepository(Generic[Model]):
             query = query.where(*args)
         return await self.session.scalar(query)
 
-    async def filter(self, *args) -> list[Model]:
+    async def filter(
+        self,
+        *where: BinaryExpression,
+        skip: int = 0,
+        limit: int = 100,
+        **filters
+    ) -> list[Model]:
+        """Filter models with pagination support."""
         query = select(self.model)
-        if args:
-            query = query.where(*args)
-        return list(await self.session.scalars(query))
+        
+        if where:
+            query = query.where(*where)
+        if filters:
+            query = query.filter_by(**filters)
+            
+        query = query.offset(skip).limit(limit)
+        result: Result = await self.session.execute(query)
+        return list(result.scalars())
+
+    async def count(self, *where: BinaryExpression) -> int:
+        """Count models matching conditions."""
+        query = select(self.model).where(*where) if where else select(self.model)
+        result: Result = await self.session.execute(query)
+        return len(list(result.scalars()))
 
     async def delete(self, *args):
         obj = await self.get(*args)
