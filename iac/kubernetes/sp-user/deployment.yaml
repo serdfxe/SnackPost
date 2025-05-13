@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: sp-user
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sp-user
@@ -28,4 +28,4 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 60

@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import Bot
-from aiogram.types import Update
+from aiogram.types import Update, Message
 
 from fastapi import FastAPI
 from fastapi.requests import Request
@@ -47,6 +47,16 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+processed_updates = set()
+
+@dp.update.outer_middleware()
+async def duplicate_filter(handler, update, data):
+    if update.update_id in processed_updates:
+        return
+    processed_updates.add(update.update_id)
+    return await handler(update, data)
 
 
 if __name__ == "__main__":

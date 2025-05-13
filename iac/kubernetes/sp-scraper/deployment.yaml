@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: sp-scraper
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sp-scraper
@@ -28,4 +28,4 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 60

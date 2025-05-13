@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: sp-content-processing
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sp-content-processing
@@ -27,5 +27,5 @@ spec:
           httpGet:
             path: /health
             port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: 60
+          periodSeconds: 60
