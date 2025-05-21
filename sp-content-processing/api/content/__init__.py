@@ -26,7 +26,7 @@ PROMPT_TEMPLATES = {
         name="article_summary",
         system_prompt=summary.SYSTEM_PROMPT,
         description="Генерация выжимок из статей",
-        model=OPENROUTER_MODEL,
+        model="deepseek/deepseek-chat:free",
     ),
 }
 
@@ -59,11 +59,9 @@ async def generate_content(
         )
 
         logger.info(f"\n\n{completion.choices[0].message.__repr__()}\n\n")
-        # logger.info(f"REASONING: \n\n{completion.choices[0].message.reasoning}\n\n")
-        # logger.info(f"CONTENT: \n\n{completion.choices[0].message.content}\n\n")
 
         return GenerationResponse(
-            content=completion.choices[0].message.reasoning if not completion.choices[0].message.content else completion.choices[0].message.content,
+            content=(completion.choices[0].message.reasoning if not completion.choices[0].message.content else completion.choices[0].message.content).strip(),
             usage=Usage(
                 prompt_tokens=completion.usage.prompt_tokens,
                 completion_tokens=completion.usage.completion_tokens,
