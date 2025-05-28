@@ -72,8 +72,7 @@ SOURCES_MENU_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
 
 ADD_SOURCE_MSG = """🔗 <b>Добавление источника</b>
 
-Пришлите ссылку на RSS-ленту или сайт. Примеры:  
-- <code>https://example.com/rss</code> (RSS)  
+Пришлите ссылку на сайт. Примеры:
 - <code>https://example.com/blog</code> (сайт)  
 
 Отмена: /cancel"""
