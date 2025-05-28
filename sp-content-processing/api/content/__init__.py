@@ -60,8 +60,23 @@ async def generate_content(
 
         logger.info(f"\n\n{completion.choices[0].message.__repr__()}\n\n")
 
+        n = 3
+
+        while (not completion.choices[0].message.content) and n:
+            n -= 1
+            completion = client.chat.completions.create(
+                model=template.model,
+                messages=messages,
+                temperature=template.temperature,
+                max_tokens=template.max_tokens,
+            )
+
+        logger.info(f"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n{request.messages}\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+        logger.info(f"\n\n{completion}\n\n")
+        # logger.info(f"\n\n{completion.choices}\n\n")
+
         return GenerationResponse(
-            content=(completion.choices[0].message.reasoning if not completion.choices[0].message.content else completion.choices[0].message.content).strip(),
+            content=completion.choices[0].message.content.strip(),
             usage=Usage(
                 prompt_tokens=completion.usage.prompt_tokens,
                 completion_tokens=completion.usage.completion_tokens,

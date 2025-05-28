@@ -1,5 +1,7 @@
 from sqlalchemy import BigInteger, Column, String
 
+from sqlalchemy.orm import relationship
+
 from core.db import Base
 from core.db.mixins import TimestampMixin
 

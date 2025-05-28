@@ -4,6 +4,9 @@ from bot.modules.start import start_router
 from bot.modules.summary import summary_router
 from bot.modules.admin import admin_router
 from bot.modules.profile import profile_router
+from bot.modules.source import source_router
+from bot.modules.cancel import cancel_router
+from bot.modules.digest import digest_router
 
 from core.config import MASTER_ID, API_TOKEN
 
@@ -16,6 +19,9 @@ def create_dp() -> Dispatcher:
         summary_router,
         admin_router,
         profile_router,
+        source_router,
+        cancel_router,
+        digest_router,
     )
 
     return dp

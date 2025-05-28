@@ -12,6 +12,8 @@ import logging
 from redis import asyncio as aioredis
 
 from api.scraper import scraper_router
+from api.source import source_router
+from api.digest import digest_router
 
 from core.config import REDIS_URL
 from core.logging import setup_logging
@@ -29,6 +31,8 @@ def init_cors(api: FastAPI) -> None:
 
 def init_routers(api: FastAPI) -> None:
     api.include_router(scraper_router)
+    api.include_router(source_router)
+    api.include_router(digest_router)
 
 
 @asynccontextmanager

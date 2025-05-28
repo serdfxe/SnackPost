@@ -1,404 +1,143 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-      "title": "User Service",
-      "description": "Hide API",
-      "version": "1.0.0"
-    },
-    "paths": {
-      "/user/": {
-        "get": {
-          "tags": [
-            "user"
-          ],
-          "summary": "Get User Route",
-          "description": "Get user data. The operation returns the data of the user that is associated with the provided X-User-Id.",
-          "operationId": "get_user_route_user__get",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User data retrieved successfully.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserResponseDTO"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "User not found."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
+  "openapi": "3.1.0",
+  "info": {
+    "title": "User Service",
+    "description": "Hide API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/user/": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get User Route",
+        "description": "Get user data. The operation returns the data of the user that is associated with the provided X-User-Id.",
+        "operationId": "get_user_route_user__get",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "X-User-Id"
             }
           }
-        },
-        "post": {
-          "tags": [
-            "user"
-          ],
-          "summary": "Post User Route",
-          "description": "Create user. The operation creates new user with provided data.",
-          "operationId": "post_user_route_user__post",
-          "requestBody": {
-            "required": true,
+        ],
+        "responses": {
+          "200": {
+            "description": "User data retrieved successfully.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserCreateDTO"
+                  "$ref": "#/components/schemas/UserResponseDTO"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserResponseDTO"
-                  }
-                }
-              }
-            },
-            "201": {
-              "description": "User created successfully."
-            },
-            "409": {
-              "description": "Conflict. User already exists."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "user"
-          ],
-          "summary": "Delete User Route",
-          "description": "Delete user. The operation removes the user that is associated with the provided X-User-Id.",
-          "operationId": "delete_user_route_user__delete",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-  
-                  }
-                }
-              }
-            },
-            "204": {
-              "description": "User deleted successfully."
-            },
-            "404": {
-              "description": "User not found."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
+          "404": {
+            "description": "User not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
         }
       },
-      "/subscription/": {
-        "get": {
-          "tags": [
-            "subscription"
-          ],
-          "summary": "Get Subscription Route",
-          "description": "Get subscription data for the user associated with the provided X-User-Id.",
-          "operationId": "get_subscription_route_subscription__get",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Post User Route",
+        "description": "Create user. The operation creates new user with provided data.",
+        "operationId": "post_user_route_user__post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Subscription data retrieved successfully.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDTO"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Subscription not found."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
+                "$ref": "#/components/schemas/UserCreateDTO"
               }
             }
           }
         },
-        "post": {
-          "tags": [
-            "subscription"
-          ],
-          "summary": "Create Subscription Route",
-          "description": "Create a new subscription for a user.",
-          "operationId": "create_subscription_route_subscription__post",
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "200": {
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionCreateDTO"
+                  "$ref": "#/components/schemas/UserResponseDTO"
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "Subscription created successfully.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDTO"
-                  }
-                }
-              }
-            },
-            "409": {
-              "description": "Conflict. Subscription already exists."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
+          "201": {
+            "description": "User created successfully."
+          },
+          "409": {
+            "description": "Conflict. User already exists."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
-        "patch": {
-          "tags": [
-            "subscription"
-          ],
-          "summary": "Update Subscription Route",
-          "description": "Update subscription for the user associated with the provided X-User-Id.",
-          "operationId": "update_subscription_route_subscription__patch",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "requestBody": {
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete User Route",
+        "description": "Delete user. The operation removes the user that is associated with the provided X-User-Id.",
+        "operationId": "delete_user_route_user__delete",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
             "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionUpdateDTO"
+
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Subscription updated successfully.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDTO"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Subscription not found."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "subscription"
-          ],
-          "summary": "Delete Subscription Route",
-          "description": "Delete subscription for the user associated with the provided X-User-Id.",
-          "operationId": "delete_subscription_route_subscription__delete",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Subscription deleted successfully."
-            },
-            "404": {
-              "description": "Subscription not found."
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/subscription/check": {
-        "get": {
-          "tags": [
-            "subscription"
-          ],
-          "summary": "Check Subscription Route",
-          "description": "Check if user has an active subscription.\nReturns True if subscription is active and not expired, False otherwise.",
-          "operationId": "check_subscription_route_subscription_check_get",
-          "parameters": [
-            {
-              "name": "x-user-id",
-              "in": "header",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "title": "X-User-Id"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "boolean",
-                    "title": "Response Check Subscription Route Subscription Check Get"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/": {
-        "get": {
-          "summary": "Read Root",
-          "operationId": "read_root__get",
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-  
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/health": {
-        "get": {
-          "summary": "Health Check",
-          "operationId": "health_check_health_get",
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-  
-                  }
+          "204": {
+            "description": "User deleted successfully."
+          },
+          "404": {
+            "description": "User not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -406,227 +145,488 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "HTTPValidationError": {
-          "properties": {
-            "detail": {
-              "items": {
-                "$ref": "#/components/schemas/ValidationError"
-              },
-              "type": "array",
-              "title": "Detail"
-            }
-          },
-          "type": "object",
-          "title": "HTTPValidationError"
-        },
-        "SubscriptionCreateDTO": {
-          "properties": {
-            "user_id": {
+    "/subscription/": {
+      "get": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Get Subscription Route",
+        "description": "Get subscription data for the user associated with the provided X-User-Id.",
+        "operationId": "get_subscription_route_subscription__get",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
               "type": "integer",
-              "title": "User Id"
-            },
-            "is_active": {
-              "type": "boolean",
-              "title": "Is Active"
-            },
-            "expires_at": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription data retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDTO"
                 }
-              ],
-              "title": "Expires At"
+              }
             }
           },
-          "type": "object",
-          "required": [
-            "user_id",
-            "is_active",
-            "expires_at"
-          ],
-          "title": "SubscriptionCreateDTO"
+          "404": {
+            "description": "Subscription not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Create Subscription Route",
+        "description": "Create a new subscription for a user.",
+        "operationId": "create_subscription_route_subscription__post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionCreateDTO"
+              }
+            }
+          }
         },
-        "SubscriptionResponseDTO": {
-          "properties": {
-            "user_id": {
+        "responses": {
+          "201": {
+            "description": "Subscription created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDTO"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. Subscription already exists."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Update Subscription Route",
+        "description": "Update subscription for the user associated with the provided X-User-Id.",
+        "operationId": "update_subscription_route_subscription__patch",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
               "type": "integer",
-              "title": "User Id"
-            },
-            "is_active": {
-              "type": "boolean",
-              "title": "Is Active"
-            },
-            "expires_at": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionUpdateDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDTO"
                 }
-              ],
-              "title": "Expires At"
-            },
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
+              }
             }
           },
-          "type": "object",
-          "required": [
-            "user_id",
-            "is_active",
-            "expires_at",
-            "id"
-          ],
-          "title": "SubscriptionResponseDTO"
-        },
-        "SubscriptionUpdateDTO": {
-          "properties": {
-            "is_active": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Is Active"
-            },
-            "expires_at": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Expires At"
-            }
+          "404": {
+            "description": "Subscription not found."
           },
-          "type": "object",
-          "title": "SubscriptionUpdateDTO"
-        },
-        "UserCreateDTO": {
-          "properties": {
-            "user_id": {
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Delete Subscription Route",
+        "description": "Delete subscription for the user associated with the provided X-User-Id.",
+        "operationId": "delete_subscription_route_subscription__delete",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
               "type": "integer",
-              "title": "User Id"
-            },
-            "first_name": {
-              "type": "string",
-              "title": "First Name"
-            },
-            "last_name": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Last Name"
-            },
-            "username": {
-              "type": "string",
-              "title": "Username"
+              "title": "X-User-Id"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Subscription deleted successfully."
           },
-          "type": "object",
-          "required": [
-            "user_id",
-            "first_name",
-            "last_name",
-            "username"
-          ],
-          "title": "UserCreateDTO"
-        },
-        "UserResponseDTO": {
-          "properties": {
-            "user_id": {
+          "404": {
+            "description": "Subscription not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/check": {
+      "get": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Check Subscription Route",
+        "description": "Check if user has an active subscription.\nReturns True if subscription is active and not expired, False otherwise.",
+        "operationId": "check_subscription_route_subscription_check_get",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": true,
+            "schema": {
               "type": "integer",
-              "title": "User Id"
-            },
-            "first_name": {
-              "type": "string",
-              "title": "First Name"
-            },
-            "last_name": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "title": "Response Check Subscription Route Subscription Check Get"
                 }
-              ],
-              "title": "Last Name"
-            },
-            "username": {
-              "type": "string",
-              "title": "Username"
-            },
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
+              }
             }
           },
-          "type": "object",
-          "required": [
-            "user_id",
-            "first_name",
-            "last_name",
-            "username",
-            "id"
-          ],
-          "title": "UserResponseDTO"
-        },
-        "ValidationError": {
-          "properties": {
-            "loc": {
-              "items": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "integer"
-                  }
-                ]
-              },
-              "type": "array",
-              "title": "Location"
-            },
-            "msg": {
-              "type": "string",
-              "title": "Message"
-            },
-            "type": {
-              "type": "string",
-              "title": "Error Type"
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
             }
-          },
-          "type": "object",
-          "required": [
-            "loc",
-            "msg",
-            "type"
-          ],
-          "title": "ValidationError"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Read Root",
+        "operationId": "read_root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "SubscriptionCreateDTO": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "is_active",
+          "expires_at"
+        ],
+        "title": "SubscriptionCreateDTO"
+      },
+      "SubscriptionResponseDTO": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "is_active",
+          "expires_at",
+          "id"
+        ],
+        "title": "SubscriptionResponseDTO"
+      },
+      "SubscriptionUpdateDTO": {
+        "properties": {
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "title": "SubscriptionUpdateDTO"
+      },
+      "UserCreateDTO": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "first_name",
+          "last_name",
+          "username"
+        ],
+        "title": "UserCreateDTO"
+      },
+      "UserResponseDTO": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "first_name",
+          "last_name",
+          "username",
+          "id"
+        ],
+        "title": "UserResponseDTO"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
   }
+}

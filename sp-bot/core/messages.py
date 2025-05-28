@@ -1,3 +1,6 @@
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 HELLO_MSG = """\
 ✨ <b>Добро пожаловать в SnackPost — вашего ИИ-ассистента для умного ведения каналов!</b>
 
@@ -53,3 +56,72 @@ SUBSCRIPTION_REQUIRED_MSG = """🔒 <b>Требуется подписка</b>
 Эта функция доступна только для пользователей с активной подпиской.
 
 Оформите подписку с помощью команды /profile"""
+
+# ===
+
+SOURCES_MENU_MSG = """📚 <b>Управление источниками</b>
+
+Здесь вы можете добавить новые источники или посмотреть текущие. Я буду проверять их раз в день и присылать свежие статьи по команде /digest!"""
+
+SOURCES_MENU_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
+    InlineKeyboardButton(text="➕ Добавить источник", callback_data="add_source"),
+    InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources")],
+    [InlineKeyboardButton(text="❌ Удалить источник", callback_data="delete_source"),
+    InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_profile"),]]
+)
+
+ADD_SOURCE_MSG = """🔗 <b>Добавление источника</b>
+
+Пришлите ссылку на RSS-ленту или сайт. Примеры:  
+- <code>https://example.com/rss</code> (RSS)  
+- <code>https://example.com/blog</code> (сайт)  
+
+Отмена: /cancel"""
+
+SOURCE_ADDED_MSG = """✅ <b>Источник добавлен!</b>
+
+Теперь я буду проверять его раз в день и присылать новые статьи."""
+
+INVALID_SOURCE_MSG = """❌ <b>Похоже этот сайт не поддерживает RSS</b>
+
+Попробуйте с другим URL."""
+
+SOURCE_LIST_MSG = """📋 <b>Ваши источники</b> (всего: {count}):
+
+{source_list}"""
+
+SOURCE_LIST_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
+    InlineKeyboardButton(text="◀️", callback_data="prev_page"),
+    InlineKeyboardButton(text="▶️", callback_data="next_page")],[InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources")]])
+
+
+DELETE_SOURCE_MSG = """🗑 <b>Удаление источника</b>
+
+Выберите источник из списка:"""
+
+DELETE_SOURCE_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[]])
+# Динамически генерируемые кнопки для каждого источника (callback_data="delete_source_{id}")
+
+SOURCE_DELETED_MSG = """🗑 <b>Источник удален</b>
+
+Больше статьи из него не будут приходить."""
+
+NOTIFICATION_SETTINGS_MSG = """⏰ <b>Настройки уведомлений</b>
+
+Выберите время, когда я буду присылать новые статьи:"""
+
+NOTIFICATION_TIME_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
+    InlineKeyboardButton(text="Утро (09:00)", callback_data="set_time_morning"),
+    InlineKeyboardButton(text="День (14:00)", callback_data="set_time_afternoon")],
+    [InlineKeyboardButton(text="Вечер (19:00)", callback_data="set_time_evening"),
+    InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources")]]
+)
+
+TIME_UPDATED_MSG = """⏰ <b>Время обновлено!</b>
+
+Теперь уведомления будут приходить в {time}."""
+
+SOURCES_SUBSCRIPTION_REQUIRED_MSG = """🔒 <b>Требуется подписка</b>
+
+Мониторинг источников доступен только с активной подпиской.  
+Оформите её в разделе /profile."""
