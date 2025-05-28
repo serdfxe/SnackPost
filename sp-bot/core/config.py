@@ -13,3 +13,4 @@ PROXY_URL: str = os.getenv("PROXY_URL", "http://nginx-proxy.snackpost.svc.cluste
 SCRAPER_URL: str = os.getenv("SCRAPER_URL", PROXY_URL + "/scraper")
 USER_URL: str = os.getenv("USER_URL", PROXY_URL + "/user")
 CONTENT_URL: str = os.getenv("CONTENT_URL", PROXY_URL + "/content-processing")
+REDIS_URL: str = os.getenv("REDIS_URL", "redis://redis.snackpost.svc.cluster.local:6379/0")

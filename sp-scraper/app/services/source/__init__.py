@@ -8,7 +8,7 @@ from core.fastapi.dependencies import get_repository
 from app.models.source import Source
 from app.models.source.schema import SourceSchema
 
-from utils.tracker import ContentTracker
+from utils.content_tracker import ContentTracker
 
 from app.services import BaseCRUDService
 
@@ -27,7 +27,7 @@ class SourceService(BaseCRUDService[Source, SourceSchema]):
 
         tracker = ContentTracker()
 
-        tracker.track_source(res)
+        await tracker.track_source(source_data['url'], user_id)
 
         return res
 

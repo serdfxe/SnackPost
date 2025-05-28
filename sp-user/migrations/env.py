@@ -11,7 +11,6 @@ from alembic import context
 from core.db import Base
 from app.models.user import User
 from app.models.subscription import Subscription
-from app.models.source import Source
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -13,5 +13,3 @@ class User(Base, TimestampMixin):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=True)
     username = Column(String, nullable=False, unique=True)
-
-    sources = relationship("Source", back_populates="user", cascade="all, delete")

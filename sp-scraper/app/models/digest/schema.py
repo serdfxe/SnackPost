@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class DigestBase(BaseModel):
-    articles: list[str]
+    articles: list[dict[str, str]]
     date: date
 
     class Config:
@@ -15,3 +15,11 @@ class DigestBase(BaseModel):
 
 class DigestSchema(DigestBase):
     id: UUID
+
+class ArticleSchema(BaseModel):
+    id: UUID
+    article_id: int
+    url: str
+
+    class Config:
+        from_attributes = True

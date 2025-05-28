@@ -10,7 +10,7 @@ from alembic import context
 
 from core.db import Base
 from app.models.source import Source
-from app.models.digest import Digest
+from app.models.digest import Digest, Article
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

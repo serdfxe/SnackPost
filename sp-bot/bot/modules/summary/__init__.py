@@ -1,6 +1,6 @@
 import asyncio
 from aiogram import Bot, Router, F
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -12,12 +12,16 @@ from core.sp_clients.sp_content_processing.content_processing_service_client.mod
     Message as SPMessage
 )
 from core.sp_clients.sp_scraper.scraper_service_client.api.scraper import scrape_article_route_scraper_scrape_get
+from core.sp_clients.sp_scraper.scraper_service_client.api.digest import (
+    get_digest_article_route_digest_article_get
+)
 from core.sp_clients.sp_content_processing.content_processing_service_client.api.content import generate_content_content_generate_system_content_router_post
 
 from core.messages import SUBSCRIPTION_REQUIRED_MSG
-from core.config import MASTER_ID
 
 from bot.filters.subscription import IsSubscribed
+from bot.utils.admin import notify_admin
+
 
 logger = logging.getLogger(__name__)
 summary_router = Router(name="summary_router")
@@ -29,20 +33,6 @@ class SummaryStates(StatesGroup):
 
 user_contexts = {}
 
-async def notify_admin(bot: Bot, message: Message, action: str, details: str = ""):
-    """Send notification to admin about user action"""
-    try:
-        if MASTER_ID:
-            user = message.from_user
-            text = (f"👤 <b>User action</b>\n"
-                   f"ID: {user.id}\n"
-                   f"Name: {user.full_name}\n"
-                   f"Username: @{user.username}\n"
-                   f"Action: {action}\n"
-                   f"Details: {details}")
-            await bot.send_message(MASTER_ID, text, parse_mode="HTML")
-    except Exception as e:
-        logger.error(f"Error sending admin notification: {e}")
 
 @summary_router.message(Command("summarize", "s"), IsSubscribed())
 async def handle_summary_command(message: Message, state: FSMContext, bot: Bot):
@@ -52,7 +42,7 @@ async def handle_summary_command(message: Message, state: FSMContext, bot: Bot):
         
         if len(args) > 1 and is_valid_url(args[1]):
             await notify_admin(bot, message, "Started summary with URL", args[1])
-            await process_url(message, args[1], state, bot)
+            await process_url(message, message.from_user.id, args[1], state, bot)
         else:
             await notify_admin(bot, message, "Started summary without URL")
             await message.answer("📝 Отправьте ссылку на статью:")
@@ -77,14 +67,46 @@ async def handle_url_input(message: Message, state: FSMContext, bot: Bot):
             return
         
         await notify_admin(bot, message, "Submitted URL for summary", message.text)
-        await process_url(message, message.text, state, bot)
+        await process_url(message, message.from_user.id, message.text, state, bot)
         
     except Exception as e:
         logger.error(f"Error in handle_url_input: {e}", exc_info=True)
         await message.answer("⚠️ Ошибка при обработке ссылки")
         await state.clear()
 
-@summary_router.message(SummaryStates.waiting_for_edit, F.text & ~F.text.startswith("/"))
+@summary_router.callback_query(F.data.startswith("create_post:"))
+async def handle_url_callback_input(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    """Process article URL from callback with article_id"""
+    logger.info(f"!!!!!!!!!!!!!!!!!!!! {callback.data}")
+
+    await state.set_state(SummaryStates.waiting_for_url)
+
+    try:
+        # Extract article_id from callback data
+        article_id = int(callback.data.split(":")[1])
+        
+        # Get article details from API
+        response = await get_digest_article_route_digest_article_get.asyncio(
+            client=scraper_client,
+            article_id=article_id
+        )
+        
+        url = response["url"]
+        
+        if not is_valid_url(url):
+            await callback.message.reply("⚠️ Неверный формат ссылки в данных статьи")
+            return
+            
+        await notify_admin(bot, callback.message, "Submitted URL from callback", url)
+        await process_url(callback.message, callback.from_user.id, url, state, bot)
+        
+    except Exception as e:
+        logger.error(f"Error in handle_url_callback_input: {e}", exc_info=True)
+        await callback.message.answer("⚠️ Ошибка при обработке ссылки из callback")
+        await state.clear()
+
+
+@summary_router.message(SummaryStates.waiting_for_edit, F.text & ~F.text.startswith("/") & ~F.text.startswith("http"))
 async def handle_edit_mode(message: Message, state: FSMContext, bot: Bot):
     """Handle user edits to the generated summary"""
     try:
@@ -133,7 +155,7 @@ async def handle_edit_mode(message: Message, state: FSMContext, bot: Bot):
         logger.error(f"Error in handle_edit_mode: {e}", exc_info=True)
         await message.answer(f"⚠️ Ошибка при обновлении выжимки")
 
-async def process_url(message: Message, url: str, state: FSMContext, bot: Bot):
+async def process_url(message: Message, user_id: int, url: str, state: FSMContext, bot: Bot):
     """Process article URL and generate initial summary"""
     try:
         progress_msg = await message.reply(
@@ -174,7 +196,7 @@ async def process_url(message: Message, url: str, state: FSMContext, bot: Bot):
         if not response or not response.content:
             raise ValueError("Не удалось получить выжимку от сервиса")
         
-        user_contexts[message.from_user.id] = {
+        user_contexts[user_id] = {
             'url': url,
             'messages': [
                 {"role": "user", "content": f"{article_text}"},

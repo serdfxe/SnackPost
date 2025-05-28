@@ -1,30 +1,43 @@
 import asyncio
+
 from aiogram import Bot, Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+
 import logging
-from urllib.parse import urlparse
 
 from core.messages import (
     SOURCES_MENU_MSG,
     ADD_SOURCE_MSG,
     SOURCE_ADDED_MSG,
-    INVALID_SOURCE_MSG,
     SOURCE_LIST_MSG,
     DELETE_SOURCE_MSG,
     SOURCE_DELETED_MSG,
     NOTIFICATION_SETTINGS_MSG,
     TIME_UPDATED_MSG,
     SOURCES_SUBSCRIPTION_REQUIRED_MSG,
-    SUBSCRIPTION_REQUIRED_MSG
 )
-from core.config import MASTER_ID
+
 from bot.filters.subscription import IsSubscribed
+from bot.utils.admin import notify_admin
+
+from core.sp_clients import scraper_client
+from core.sp_clients.sp_scraper.scraper_service_client.api.sources import (
+    create_source_route_sources_post,
+    get_sources_route_sources_get,
+    delete_source_route_sources_source_id_delete,
+)
+from core.sp_clients.sp_scraper.scraper_service_client.models import (
+    SourceCreateDTO,
+    SourceType,
+)
+
 
 logger = logging.getLogger(__name__)
 source_router = Router(name="source_router")
+
 
 class SourcesStates(StatesGroup):
     """FSM states for sources management"""
@@ -32,57 +45,48 @@ class SourcesStates(StatesGroup):
     waiting_for_delete_confirmation = State()
     waiting_for_time_selection = State()
 
-# Заглушки для работы с бэкендом
 async def add_user_source(user_id: int, url: str, source_type: str) -> bool:
     """Add new source for user (stub)"""
     logger.info(f"Adding source for user {user_id}: {url} ({source_type})")
-    return True
+    
+    try:
+        res = await create_source_route_sources_post.asyncio(
+            client=scraper_client,
+            x_user_id=user_id,
+            body=SourceCreateDTO(
+                url=url,
+                type_=SourceType[source_type.upper()]
+            )
+        )
+
+        logger.info(f"\n\nRes:\n\n{res.__repr__()}\n\n")
+
+        return res
+    except Exception as e:
+        logger.info(f"\n\nError:\n\n{e.__repr__()}\n\n")
 
 async def get_user_sources(user_id: int) -> list[dict]:
     """Get user sources list (stub)"""
-    return [
-        {"id": 1, "url": "https://example.com/rss", "type": "rss"},
-        {"id": 2, "url": "https://example.com/blog", "type": "website"}
-    ]
+    return await get_sources_route_sources_get.asyncio(
+        client=scraper_client,
+        x_user_id=user_id
+    )
 
 async def delete_user_source(user_id: int, source_id: int) -> bool:
     """Delete user source (stub)"""
     logger.info(f"Deleting source {source_id} for user {user_id}")
+    await delete_source_route_sources_source_id_delete.asyncio(
+        client=scraper_client,
+        source_id=source_id,
+        x_user_id=user_id,
+    )
+
     return True
 
 async def set_user_notification_time(user_id: int, time: str) -> bool:
     """Set notification time for user (stub)"""
     logger.info(f"Setting notification time for user {user_id}: {time}")
     return True
-
-async def notify_admin(bot: Bot, message: Message | CallbackQuery, action: str, details: str = ""):
-    """Send notification to admin about user action"""
-    try:
-        if MASTER_ID:
-            user = message.from_user
-            text = (f"👤 <b>User action</b>\n"
-                   f"ID: {user.id}\n"
-                   f"Name: {user.full_name}\n"
-                   f"Username: @{user.username}\n"
-                   f"Action: {action}\n"
-                   f"Details: {details}")
-            await bot.send_message(MASTER_ID, text, parse_mode="HTML")
-    except Exception as e:
-        logger.error(f"Error sending admin notification: {e}")
-
-def is_valid_source_url(url: str) -> bool:
-    """Validate source URL format"""
-    try:
-        result = urlparse(url)
-        return all([result.scheme in ('http', 'https'), result.netloc])
-    except ValueError:
-        return False
-
-def determine_source_type(url: str) -> str:
-    """Determine source type by URL"""
-    if url.endswith(('.rss', '.xml')) or '/rss' in url:
-        return 'rss'
-    return 'website'
 
 @source_router.message(Command("sources"), IsSubscribed())
 async def handle_sources_command(message: Message, state: FSMContext, bot: Bot):
@@ -104,7 +108,7 @@ async def show_sources_menu(message: Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить источник", callback_data="add_source")],
         [InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources")],
-        [InlineKeyboardButton(text="⏰ Настроить время", callback_data="set_notification_time")],
+        # [InlineKeyboardButton(text="⏰ Настроить время", callback_data="set_notification_time")],
     ])
     await message.answer(SOURCES_MENU_MSG, parse_mode="HTML", reply_markup=keyboard)
 
@@ -115,7 +119,7 @@ async def back_to_sources_menu(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(SOURCES_MENU_MSG, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить источник", callback_data="add_source")],
         [InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources")],
-        [InlineKeyboardButton(text="⏰ Настроить время", callback_data="set_notification_time")],
+        # [InlineKeyboardButton(text="⏰ Настроить время", callback_data="set_notification_time")],
     ]))
     await callback.answer()
 
@@ -130,40 +134,57 @@ async def add_source_callback(callback: CallbackQuery, state: FSMContext, bot: B
 @source_router.message(SourcesStates.waiting_for_source_url, F.text & ~F.text.startswith("/"))
 async def handle_source_url_input(message: Message, state: FSMContext, bot: Bot):
     """Process user-provided source URL"""
+    url = message.text.strip()
     try:
-        url = message.text.strip()
-        if not is_valid_source_url(url):
-            await message.reply(INVALID_SOURCE_MSG, parse_mode="HTML")
-            return
+        mess = await message.reply("🔎 Проверяю источник...")
+        rss_url = None # await is_valid_source_url(url)
+
+        # logger.info(f"\n\n{rss_url}\n\n")
         
-        source_type = determine_source_type(url)
-        success = await add_user_source(message.from_user.id, url, source_type)
+        await mess.edit_text("🔌 Добавляю источник...", parse_mode="HTML")
+        
+        source_url = rss_url or url
+        source_type = "rss" if rss_url else "website"
+
+        success = await add_user_source(message.from_user.id, source_url, source_type)
         
         if not success:
             raise Exception("Failed to add source")
         
-        await notify_admin(bot, message, "Added new source", f"{url} ({source_type})")
-        await message.answer(SOURCE_ADDED_MSG, parse_mode="HTML")
+        await notify_admin(bot, message, "Added new source", f"{url}\n\n->\n\n{source_url} ({source_type})")
+        await mess.edit_text(SOURCE_ADDED_MSG, parse_mode="HTML")
         await state.clear()
+
+        await asyncio.sleep(2)
+
+        await mess.edit_text(SOURCES_MENU_MSG, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="➕ Добавить источник", callback_data="add_source")],
+            [InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources")],
+            # [InlineKeyboardButton(text="⏰ Настроить время", callback_data="set_notification_time")],
+        ]))
         
     except Exception as e:
         logger.error(f"Error in handle_source_url_input: {e}", exc_info=True)
-        await message.answer("⚠️ Ошибка при добавлении источника")
+        await mess.edit_text("⚠️ Ошибка при добавлении источника")
         await state.clear()
 
 @source_router.callback_query(F.data == "list_sources")
 async def list_user_sources(callback: CallbackQuery, bot: Bot):
     """Show list of user's sources"""
     try:
-        sources = await get_user_sources(callback.from_user.id)
+        sources = (await get_user_sources(callback.from_user.id)).data
         if not sources:
             await callback.message.edit_text("📭 У вас пока нет добавленных источников", reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🔙 Назад", callback_data="sources_menu")]
             ]))
             return
         
+        logger.info(
+            f"\n\n{sources.__repr__()}\n\n"
+        )
+
         source_list = "\n".join(
-            f"{i+1}. <code>{source['url']}</code> ({source['type']})"
+            f"{i+1}. <code>{source.url}</code> ({source.type_})"
             for i, source in enumerate(sources))
         
         await callback.message.edit_text(
@@ -184,13 +205,13 @@ async def list_user_sources(callback: CallbackQuery, bot: Bot):
 async def start_delete_source(callback: CallbackQuery, state: FSMContext, bot: Bot):
     """Start source deletion process"""
     try:
-        sources = await get_user_sources(callback.from_user.id)
+        sources = (await get_user_sources(callback.from_user.id)).data
         if not sources:
             await callback.answer("Нет источников для удаления")
             return
         
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text=f"❌ {source['url']}", callback_data=f"confirm_delete_{source['id']}")]
+            [InlineKeyboardButton(text=f"❌ {source.url}", callback_data=f"confirm_delete_{source.id}")]
             for source in sources
         ] + [
             [InlineKeyboardButton(text="🔙 Назад", callback_data="list_sources")]
@@ -208,7 +229,7 @@ async def start_delete_source(callback: CallbackQuery, state: FSMContext, bot: B
 async def confirm_delete_source(callback: CallbackQuery, bot: Bot):
     """Confirm and delete source"""
     try:
-        source_id = int(callback.data.split("_")[-1])
+        source_id = callback.data.split("_")[-1]
         success = await delete_user_source(callback.from_user.id, source_id)
         
         if not success:

@@ -11,9 +11,9 @@ from app.models.source import Source
 from core.db.repository import DatabaseRepository
 from core.fastapi.dependencies import get_repository
 
-from utils.tracker import ContentTracker
+from utils.content_tracker import ContentTracker
 
-from app.models.digest import Digest
+from app.models.digest import Digest, Article
 from app.models.digest.schema import DigestSchema
 
 from app.services.source import SourceService
@@ -24,9 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class DigestService(BaseCRUDService[Digest, DigestSchema]):
-    def __init__(self, digest_repo: DatabaseRepository[Digest], source_repo: DatabaseRepository[Source]):
+    def __init__(self, digest_repo: DatabaseRepository[Digest], source_repo: DatabaseRepository[Source], article_repo: DatabaseRepository[Article]):
         self.digest_repo = digest_repo
         self.source_repo = source_repo
+        self.article_repo = article_repo
         
         super().__init__(digest_repo, DigestSchema)
     
@@ -38,11 +39,15 @@ class DigestService(BaseCRUDService[Digest, DigestSchema]):
 
             tracker = ContentTracker()
 
-            result = list(chain(*[tracker.get_new_content(s) for s in sources]))
+            result = list(chain(*[await tracker.get_new_content(s.url, user_id) for s in sources]))
+
+            for i in range(len(result)):
+                res = await self.article_repo.create(url=result[i]["link"])
+                result[i]['id'] = f"{res.article_id}"
 
             digest = await super().create({
                 "user_id": user_id,
-                "articles": [i["link"] for i in result],
+                "articles": [i for i in result],
                 "date": date,
             })
 
@@ -70,7 +75,11 @@ class DigestService(BaseCRUDService[Digest, DigestSchema]):
 
 
 def get_digest_service():
-    def func(digest_repo: DatabaseRepository[Digest] = Depends(get_repository(Digest)), source_repo: DatabaseRepository[Source] = Depends(get_repository(Source))):
-        return DigestService(digest_repo, source_repo)
+    def func(
+            digest_repo: DatabaseRepository[Digest] = Depends(get_repository(Digest)),
+            source_repo: DatabaseRepository[Source] = Depends(get_repository(Source)),
+            article_repo: DatabaseRepository[Article] = Depends(get_repository(Article)),
+        ):
+        return DigestService(digest_repo, source_repo, article_repo)
 
     return func

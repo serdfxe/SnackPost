@@ -5,7 +5,6 @@ import logging
 
 from api.user import user_router
 from api.subscription import subscription_router
-from api.source import source_router
 
 from core.logging import setup_logging
 
@@ -23,7 +22,6 @@ def init_cors(api: FastAPI) -> None:
 def init_routers(api: FastAPI) -> None:
     api.include_router(user_router)
     api.include_router(subscription_router)
-    api.include_router(source_router)
 
 
 def create_api() -> FastAPI:
