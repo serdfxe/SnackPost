@@ -11,6 +11,8 @@ from uuid import UUID
 from app.models.source import Source
 from app.services.source import SourceService, get_source_service
 
+from utils.content_tracker import ContentTracker
+
 from .dto import (
     SourceResponseDTO,
     SourceCreateDTO,
@@ -147,3 +149,20 @@ async def delete_source_route(
     
     await service.delete(id=source_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@source_router.get("/articles/all")
+async def get_all_articels(
+    x_user_id: Annotated[int, Header()],
+    service: Annotated[SourceService, Depends(get_source_service())],
+):
+    sources = await service.get_all(user_id=x_user_id)
+
+    tracker = ContentTracker()
+
+    res = []
+
+    for i in sources:
+        res.extend(await tracker.get_content(i.url, x_user_id))
+
+    return res

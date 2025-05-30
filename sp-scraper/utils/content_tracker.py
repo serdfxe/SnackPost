@@ -3,8 +3,12 @@ from redis import asyncio as aioredis
 
 from core.config import REDIS_URL
 
-from .get_articles import get_articles
+from .get_articles import get_articles, get_links
+from .extract_and_filter_articles import process_links
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ContentTracker:
     def __init__(self, redis_url: str = REDIS_URL):
@@ -18,9 +22,21 @@ class ContentTracker:
             source_url: URL of the source to track
             user_id: ID of the user who wants to track the source
         """
-        current_articles = await get_articles(source_url)
+        current_links = await get_links(source_url)
+
+        logger.info(f"\n\n All extracted links:\n\n{current_links}\n\n")
+
+        current_articles = process_links(current_links, set())
+
         redis_key = f"content_tracker:{user_id}:{source_url}"
-        await self.redis.set(redis_key, json.dumps(current_articles))
+        await self.redis.set(redis_key, json.dumps({
+            "links": list(current_links.keys()),
+            "articles": {
+                k: {
+                    "title": d
+                } for k, d in current_articles.items()
+            }
+        }))
     
     async def get_new_content(self, source_url: str, user_id: int) -> list[dict[str, str]]:
         """
@@ -33,29 +49,52 @@ class ContentTracker:
         Returns:
             List of new articles since last check (each article is a dict with title and link)
         """
-        current_articles = None
-        while not current_articles:
-            try:
-                current_articles = await get_articles(source_url)
-            except Exception:
-                ...
         
         redis_key = f"content_tracker:{user_id}:{source_url}"
-        last_snapshot_json = await self.redis.get(redis_key)
+        last_snapshot = json.loads(await self.redis.get(redis_key))
 
-        if not last_snapshot_json:
-            new_articles = current_articles
-        else:
-            last_snapshot = json.loads(last_snapshot_json)
-            current_links = {article['link'] for article in current_articles}
-            last_links = {article['link'] for article in last_snapshot}
-            new_links = current_links - last_links
-            new_articles = [article for article in current_articles if article['link'] in new_links]
+        logger.info(f"\n\n LAST SNAPSHOT:\n\n{last_snapshot}\n\n")
+
+        snapshot_links = set(last_snapshot["links"])
+        snapshot_articles = last_snapshot["articles"]
+
+        current_links = {}
+        while not current_links:
+            try:
+                current_links = await get_links(source_url)
+            except Exception:
+                ...
+
+        logger.info(f"\n\n CURRENT LINKS:\n\n{current_links}\n\n")
+
+        new_links = process_links(current_links, set(snapshot_links))
+
+        snapshot_links.update(current_links.keys())
+        snapshot_articles.update({k: {"title": d} for k, d in new_links.items()})
         
-        if current_articles:
-            await self.redis.set(redis_key, json.dumps(current_articles))
+        if last_snapshot:
+            await self.redis.set(redis_key, json.dumps({
+                "links": list(snapshot_links),
+                "articles": snapshot_articles
+            }))
         
-        return new_articles
+        return [
+            {"link": k, "title": d}
+            for k, d in new_links.items()
+        ]
+
+    async def get_content(self, source_url: str, user_id: int) -> list[dict[str, str]]:
+        redis_key = f"content_tracker:{user_id}:{source_url}"
+        last_snapshot = json.loads(await self.redis.get(redis_key))
+
+        logger.info(f"\n\n LAST SNAPSHOT:\n\n{last_snapshot}\n\n")
+
+        snapshot_articles = last_snapshot["articles"]
+        
+        return [
+            {"link": k, "title": d["title"]}
+            for k, d in snapshot_articles.items()
+        ]
 
     async def close(self) -> None:
         """Close the Redis connection"""
