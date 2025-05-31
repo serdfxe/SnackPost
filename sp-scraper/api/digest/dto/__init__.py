@@ -10,5 +10,4 @@ class DigestBase(BaseModel):
     articles: list[ArticleBase]
 
 
-class DigestResponse(DigestBase):
-    ...
+class DigestResponse(DigestBase): ...

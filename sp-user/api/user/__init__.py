@@ -43,15 +43,14 @@ async def get_user_route(
     Get user data. The operation returns the data of the user that is associated with the provided X-User-Id.
     """
     logger.info(f"Attempting to fetch user with ID: {x_user_id}")
-    
+
     try:
         user = await repository.get(User.user_id == x_user_id)
 
         if not user:
             logger.warning(f"User not found with ID: {x_user_id}")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found."
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
             )
 
         logger.info(f"Successfully retrieved user with ID: {x_user_id}")
@@ -61,14 +60,16 @@ async def get_user_route(
         logger.error(f"Database error while fetching user {x_user_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+            detail="Database error occurred.",
         )
-        
+
     except Exception as e:
-        logger.error(f"Unexpected error while fetching user {x_user_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error while fetching user {x_user_id}: {str(e)}", exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
+            detail="An unexpected error occurred.",
         )
 
 
@@ -98,22 +99,21 @@ async def post_user_route(
     except IntegrityError as e:
         logger.warning(f"User creation conflict: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User already exists."
+            status_code=status.HTTP_409_CONFLICT, detail="User already exists."
         )
-    
+
     except SQLAlchemyError as e:
         logger.error(f"Database error during user creation: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+            detail="Database error occurred.",
         )
-    
+
     except Exception as e:
         logger.error(f"Unexpected error during user creation: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
+            detail="An unexpected error occurred.",
         )
 
 
@@ -138,8 +138,7 @@ async def delete_user_route(
         if not user:
             logger.warning(f"User not found for deletion with ID: {x_user_id}")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found."
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
             )
 
         deleted = await repository.delete(x_user_id)
@@ -147,7 +146,7 @@ async def delete_user_route(
             logger.error(f"Failed to delete user with ID: {x_user_id}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to delete user."
+                detail="Failed to delete user.",
             )
 
         logger.info(f"Successfully deleted user with ID: {x_user_id}")
@@ -157,12 +156,14 @@ async def delete_user_route(
         logger.error(f"Database error while deleting user {x_user_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred while deleting user."
+            detail="Database error occurred while deleting user.",
         )
-        
+
     except Exception as e:
-        logger.error(f"Unexpected error while deleting user {x_user_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error while deleting user {x_user_id}: {str(e)}", exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while deleting user."
+            detail="An unexpected error occurred while deleting user.",
         )

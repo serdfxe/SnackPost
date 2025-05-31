@@ -16,5 +16,4 @@ class UserResponseDTO(UserBase):
     id: UUID
 
 
-class UserCreateDTO(UserBase):
-    ...
+class UserCreateDTO(UserBase): ...

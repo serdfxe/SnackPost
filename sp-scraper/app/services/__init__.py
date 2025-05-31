@@ -13,8 +13,8 @@ from core.db.uow import get_uow
 logger = logging.getLogger(__name__)
 
 
-T = TypeVar('T')
-S = TypeVar('S', bound=BaseModel)
+T = TypeVar("T")
+S = TypeVar("S", bound=BaseModel)
 
 
 class BaseCRUDService(Generic[T, S]):
@@ -27,9 +27,9 @@ class BaseCRUDService(Generic[T, S]):
         """Create a new record"""
         if isinstance(data, BaseModel):
             data = data.model_dump()
-        
+
         created = await self.repo.create(**data, **kwargs)
-        
+
         return self._to_schema(created)
 
     async def get(self, id: UUID, **kwargs) -> Optional[S]:
@@ -48,9 +48,9 @@ class BaseCRUDService(Generic[T, S]):
         """Update existing record"""
         if isinstance(data, BaseModel):
             data = data.model_dump(exclude_unset=True)
-        
+
         updated = await self.repo.update(id, data, **kwargs)
-        
+
         return self._to_schema(updated)
 
     async def delete(self, id: UUID, **kwargs) -> Dict[str, str]:

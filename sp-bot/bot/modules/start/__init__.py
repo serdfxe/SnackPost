@@ -6,8 +6,12 @@ from core.config import MASTER_ID
 from core.messages import HELLO_MSG
 
 from core.sp_clients import user_client
-from core.sp_clients.sp_user.user_service_client.api.user import post_user_route_user_post
-from core.sp_clients.sp_user.user_service_client.models.user_create_dto import UserCreateDTO
+from core.sp_clients.sp_user.user_service_client.api.user import (
+    post_user_route_user_post,
+)
+from core.sp_clients.sp_user.user_service_client.models.user_create_dto import (
+    UserCreateDTO,
+)
 
 start_router = Router(name="start_router")
 
@@ -34,5 +38,5 @@ async def registered_start_message_handler(message: Message, bot: Bot):
             first_name=message.from_user.first_name,
             last_name=message.from_user.last_name,
             username=message.from_user.username,
-        )
+        ),
     )

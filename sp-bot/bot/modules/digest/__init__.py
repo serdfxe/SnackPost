@@ -1,5 +1,11 @@
 from aiogram import Bot, Router
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, LinkPreviewOptions
+from aiogram.types import (
+    Message,
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    LinkPreviewOptions,
+)
 from aiogram.filters import Command
 
 from datetime import date
@@ -10,8 +16,12 @@ from bot.filters.subscription import IsSubscribed
 from bot.utils.admin import notify_admin
 
 from core.sp_clients import scraper_client
-from core.sp_clients.sp_scraper.scraper_service_client.api.digest import get_digest_route_digest_get
-from core.sp_clients.sp_scraper.scraper_service_client.models.digest_schema import DigestSchema 
+from core.sp_clients.sp_scraper.scraper_service_client.api.digest import (
+    get_digest_route_digest_get,
+)
+from core.sp_clients.sp_scraper.scraper_service_client.models.digest_schema import (
+    DigestSchema,
+)
 
 from core.digest_messages import (
     DIGEST_FOOTER_MSG,
@@ -27,8 +37,8 @@ logger = logging.getLogger(__name__)
 digest_router = Router(name="digest_router")
 
 
-async def show_article(article, bot: Bot):
-    ...
+async def show_article(article, bot: Bot): ...
+
 
 async def show_digest(message: Message, edit: bool = False):
     mess = await message.answer(
@@ -49,7 +59,10 @@ async def show_digest(message: Message, edit: bool = False):
         return
 
     await mess.edit_text(
-        DIGEST_HEADER_MSG.format(date=date.today().strftime('%d.%m.%Y'), new_articles_count=len(digest.articles)),
+        DIGEST_HEADER_MSG.format(
+            date=date.today().strftime("%d.%m.%Y"),
+            new_articles_count=len(digest.articles),
+        ),
         parse_mode="HTML",
     )
 
@@ -60,12 +73,17 @@ async def show_digest(message: Message, edit: bool = False):
             ),
             reply_markup=get_article_card_buttons(i["id"], i["link"]),
             parse_mode="HTML",
-            link_preview_options=LinkPreviewOptions(is_disabled=False, prefer_small_media=True, show_above_text=True, url=i["link"]),
+            link_preview_options=LinkPreviewOptions(
+                is_disabled=False,
+                prefer_small_media=True,
+                show_above_text=True,
+                url=i["link"],
+            ),
         )
-    
+
     if message.from_user.id in (894361829, 148636247):
         await message.answer(
-"""\
+            """\
 🔍 <b>Так же вот, что на мой взгляд стоит перечитать или открыть для себя заново:</b>
 
 1. <b>«Критическое мышление для продуктовых команд»</b>
@@ -89,7 +107,7 @@ async def show_digest(message: Message, edit: bool = False):
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
-    
+
     # await message.answer(
     #     DIGEST_FOOTER_MSG,
     #     parse_mode="HTML",

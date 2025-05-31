@@ -39,6 +39,7 @@ Critical requirements:
 - ALWAYS translate titles to Russian
 """
 
+
 def process_links(data: Dict[str, str], existing: set[str]) -> Dict[str, str]:
     new_links = {url: title for url, title in data.items() if url not in existing}
 
@@ -74,21 +75,25 @@ def process_links(data: Dict[str, str], existing: set[str]) -> Dict[str, str]:
     while n:
         n -= 1
         try:
-            return extract_and_filter_articles(completion.choices[0].message.content.strip(), set(data.keys()))
+            return extract_and_filter_articles(
+                completion.choices[0].message.content.strip(), set(data.keys())
+            )
         except Exception:
             logger.info(f"\n\nTrying to extract json...\n\n")
-    
+
     raise ValueError
 
 
-def extract_and_filter_articles(llm_response: str, original_links: set[str]) -> Dict[str, str]:
+def extract_and_filter_articles(
+    llm_response: str, original_links: set[str]
+) -> Dict[str, str]:
     """
     Извлекает словарь из ответа LLM и фильтрует несуществующие ссылки.
-    
+
     Args:
         llm_response (str): Ответ LLM в виде строки (ожидается JSON-подобный dict).
         original_links (Dict[str, str]): Исходный словарь ссылок для проверки.
-    
+
     Returns:
         Dict[str, str]: Отфильтрованный словарь с существующими ссылками.
     """
@@ -98,7 +103,9 @@ def extract_and_filter_articles(llm_response: str, original_links: set[str]) -> 
     except json.JSONDecodeError:
         # Если ответ не JSON, ищем в тексте структуру dict
         try:
-            extracted_dict = eval("{" + llm_response.split("{", 1)[-1].rsplit("}", 1)[0] + "}")
+            extracted_dict = eval(
+                "{" + llm_response.split("{", 1)[-1].rsplit("}", 1)[0] + "}"
+            )
         except:
             return {}
 
@@ -107,10 +114,7 @@ def extract_and_filter_articles(llm_response: str, original_links: set[str]) -> 
             raise ValueError("Unknown link.")
 
     # Фильтруем ссылки, оставляя только те, что есть в исходных данных
-    filtered_articles = {
-        url: title
-        for url, title in extracted_dict.items()
-    }
+    filtered_articles = {url: title for url, title in extracted_dict.items()}
 
     logger.info(f"\n\n Extracted:\n\n{extracted_dict}\n\n")
     logger.info(f"\n\n Filtered:\n\n{filtered_articles}\n\n")

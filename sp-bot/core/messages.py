@@ -1,4 +1,3 @@
-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 HELLO_MSG = """\
@@ -63,11 +62,21 @@ SOURCES_MENU_MSG = """📚 <b>Управление источниками</b>
 
 Здесь вы можете добавить новые источники или посмотреть текущие. Я буду проверять их раз в день и присылать свежие статьи по команде /digest!"""
 
-SOURCES_MENU_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
-    InlineKeyboardButton(text="➕ Добавить источник", callback_data="add_source"),
-    InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources")],
-    [InlineKeyboardButton(text="❌ Удалить источник", callback_data="delete_source"),
-    InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_profile"),]]
+SOURCES_MENU_BUTTONS = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="➕ Добавить источник", callback_data="add_source"
+            ),
+            InlineKeyboardButton(text="🗂 Мои источники", callback_data="list_sources"),
+        ],
+        [
+            InlineKeyboardButton(
+                text="❌ Удалить источник", callback_data="delete_source"
+            ),
+            InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_profile"),
+        ],
+    ]
 )
 
 ADD_SOURCE_MSG = """🔗 <b>Добавление источника</b>
@@ -89,9 +98,15 @@ SOURCE_LIST_MSG = """📋 <b>Ваши источники</b> (всего: {count
 
 {source_list}"""
 
-SOURCE_LIST_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
-    InlineKeyboardButton(text="◀️", callback_data="prev_page"),
-    InlineKeyboardButton(text="▶️", callback_data="next_page")],[InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources")]])
+SOURCE_LIST_BUTTONS = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="◀️", callback_data="prev_page"),
+            InlineKeyboardButton(text="▶️", callback_data="next_page"),
+        ],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources")],
+    ]
+)
 
 
 DELETE_SOURCE_MSG = """🗑 <b>Удаление источника</b>
@@ -109,11 +124,21 @@ NOTIFICATION_SETTINGS_MSG = """⏰ <b>Настройки уведомлений<
 
 Выберите время, когда я буду присылать новые статьи:"""
 
-NOTIFICATION_TIME_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[[
-    InlineKeyboardButton(text="Утро (09:00)", callback_data="set_time_morning"),
-    InlineKeyboardButton(text="День (14:00)", callback_data="set_time_afternoon")],
-    [InlineKeyboardButton(text="Вечер (19:00)", callback_data="set_time_evening"),
-    InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources")]]
+NOTIFICATION_TIME_BUTTONS = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Утро (09:00)", callback_data="set_time_morning"),
+            InlineKeyboardButton(
+                text="День (14:00)", callback_data="set_time_afternoon"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="Вечер (19:00)", callback_data="set_time_evening"
+            ),
+            InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_sources"),
+        ],
+    ]
 )
 
 TIME_UPDATED_MSG = """⏰ <b>Время обновлено!</b>

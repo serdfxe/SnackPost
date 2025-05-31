@@ -22,27 +22,29 @@ logging.basicConfig(level=logging.DEBUG)
 #     """Запуск Celery beat"""
 #     celery_app.Beat(loglevel='info').run()
 
+
 async def run_bot():
     """Запуск бота"""
     await main()
 
+
 if __name__ == "__main__":
     # # Для Windows необходимо использовать spawn метод
     # from multiprocessing import Process, set_start_method
-    
+
     # try:
     #     set_start_method('spawn')
     # except RuntimeError:
     #     pass  # Метод уже установлен
-    
+
     # # Создаем процессы
     # worker_process = Process(target=run_celery_worker)
     # beat_process = Process(target=run_celery_beat)
-    
+
     # # Запускаем процессы
     # worker_process.start()
     # beat_process.start()
-    
+
     try:
         # Запускаем бота в основном потоке
         asyncio.run(run_bot())

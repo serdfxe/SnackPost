@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 class SourceService(BaseCRUDService[Source, SourceSchema]):
     def __init__(self, repo: DatabaseRepository[Source]):
         super().__init__(repo, SourceSchema)
-    
+
     async def create_with_user(self, user_id: int, source_data: dict) -> SourceSchema:
-        source_data['user_id'] = user_id
+        source_data["user_id"] = user_id
 
         res = await self.create(source_data)
 
         tracker = ContentTracker()
 
-        await tracker.track_source(source_data['url'], user_id)
+        await tracker.track_source(source_data["url"], user_id)
 
         return res
 
@@ -38,5 +38,5 @@ class SourceService(BaseCRUDService[Source, SourceSchema]):
 def get_source_service():
     def func(repo: DatabaseRepository[Source] = Depends(get_repository(Source))):
         return SourceService(repo)
-    
+
     return func

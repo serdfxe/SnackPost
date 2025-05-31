@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, 
+    Column,
     String,
     Enum,
     Index,
@@ -19,12 +19,10 @@ class SourceType(str, enum.Enum):
 
 class Source(Base, TimestampMixin):
     __tablename__ = "sources"
-    
+
     user_id = Column(BigInteger, nullable=False)
-    
+
     url = Column(String(2048), nullable=False)
     type = Column(Enum(SourceType), nullable=False)
-    
-    __table_args__ = (
-        Index("ix_user_source_url", "user_id", "url", unique=True),
-    )
+
+    __table_args__ = (Index("ix_user_source_url", "user_id", "url", unique=True),)

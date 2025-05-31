@@ -35,20 +35,16 @@ class DatabaseRepository(Generic[Model]):
         return await self.session.scalar(query)
 
     async def filter(
-        self,
-        *where: BinaryExpression,
-        skip: int = 0,
-        limit: int = 100,
-        **filters
+        self, *where: BinaryExpression, skip: int = 0, limit: int = 100, **filters
     ) -> list[Model]:
         """Filter models with pagination support."""
         query = select(self.model)
-        
+
         if where:
             query = query.where(*where)
         if filters:
             query = query.filter_by(**filters)
-            
+
         query = query.offset(skip).limit(limit)
         result: Result = await self.session.execute(query)
         return list(result.scalars())

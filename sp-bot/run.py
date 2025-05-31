@@ -51,6 +51,7 @@ def health_check():
 
 processed_updates = set()
 
+
 @dp.update.outer_middleware()
 async def duplicate_filter(handler, update, data):
     if update.update_id in processed_updates:

@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 @scraper_router.get("/scrape")
-@cache(expire=89280*7)
+@cache(expire=89280 * 7)
 async def scrape_article_route(url: str) -> ScraperResponse:
     """
     Parse article by URL.
     """
     try:
         logger.info(f"Starting scraping for URL: {url}")
-        
+
         scraper = PageContentExtractor()
         result = scraper.get_page_content(url)
 

@@ -6,9 +6,11 @@ class Message(BaseModel):
     role: str
     content: str
 
+
 class Variable(BaseModel):
     name: str
     value: str
+
 
 class GenerationRequest(BaseModel):
     messages: List[Message]
@@ -18,6 +20,7 @@ class GenerationRequest(BaseModel):
 class Usage(BaseModel):
     prompt_tokens: int
     completion_tokens: int
+
 
 class GenerationResponse(BaseModel):
     content: str

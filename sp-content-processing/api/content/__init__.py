@@ -49,7 +49,9 @@ async def generate_content(
                 key, value = var.key, var.value
                 system_prompt = system_prompt.replace(f"{{{key}}}", value)
 
-        messages = [{"role": "system", "content": system_prompt}] + [i.model_dump() for i in request.messages]
+        messages = [{"role": "system", "content": system_prompt}] + [
+            i.model_dump() for i in request.messages
+        ]
 
         completion = client.chat.completions.create(
             model=template.model,
@@ -71,7 +73,9 @@ async def generate_content(
                 max_tokens=template.max_tokens,
             )
 
-        logger.info(f"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n{request.messages}\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+        logger.info(
+            f"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n{request.messages}\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n"
+        )
         logger.info(f"\n\n{completion}\n\n")
         # logger.info(f"\n\n{completion.choices}\n\n")
 

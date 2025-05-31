@@ -39,6 +39,4 @@ async def get_digest_article_route(
     article_id: int,
     article_repo: ArticleRepository,
 ) -> dict[str, str]:
-    return {
-        "url": (await article_repo.get(Article.article_id == article_id)).url
-    }
+    return {"url": (await article_repo.get(Article.article_id == article_id)).url}

@@ -9,10 +9,8 @@ async def get_articles(url: str, existing: dict[str, str]) -> list[dict[str, str
 
     data = process_links(raw, existing)
 
-    return [
-        {"link": k, "title": d}
-        for k, d in data.items()
-    ]
+    return [{"link": k, "title": d} for k, d in data.items()]
+
 
 async def get_links(url: str) -> dict[str, str]:
     """return {"url": "title", ...}"""

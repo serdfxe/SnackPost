@@ -36,20 +36,11 @@ async def get_sources_route(
     limit: int = 100,
 ) -> SourceListResponseDTO:
     try:
-        sources = await service.get_all(
-            user_id=x_user_id,
-            skip=skip,
-            limit=limit
-        )
+        sources = await service.get_all(user_id=x_user_id, skip=skip, limit=limit)
 
         count = await service.repo.count(Source.user_id == x_user_id)
 
-        return {
-            "data": sources,
-            "count": count,
-            "skip": skip,
-            "limit": limit
-        }
+        return {"data": sources, "count": count, "skip": skip, "limit": limit}
     except SQLAlchemyError as e:
         logger.error(f"Database error: {str(e)}")
         raise HTTPException(
@@ -59,12 +50,12 @@ async def get_sources_route(
 
 
 @source_router.post(
-    "/", 
+    "/",
     status_code=201,
     responses={
         201: {"detail": "Successfully created"},
-        409: {"detail": "Source already exists"}
-    }
+        409: {"detail": "Source already exists"},
+    },
 )
 async def create_source_route(
     service: Annotated[SourceService, Depends(get_source_service())],
@@ -73,30 +64,26 @@ async def create_source_route(
 ) -> SourceResponseDTO:
     try:
         existing = await service.repo.get(
-            (Source.user_id == x_user_id) & 
-            (Source.url == str(data.url)))
+            (Source.user_id == x_user_id) & (Source.url == str(data.url))
+        )
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Source already exists"
+                status_code=status.HTTP_409_CONFLICT, detail="Source already exists"
             )
-            
+
         source = await service.create_with_user(
-            user_id=x_user_id,
-            source_data=data.model_dump()
+            user_id=x_user_id, source_data=data.model_dump()
         )
         return source
-    
+
     except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid data"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid data"
         )
     except SQLAlchemyError as e:
         logger.error(f"Database error: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error"
         )
 
 
@@ -109,25 +96,21 @@ async def update_source_route(
 ) -> SourceResponseDTO:
     # First verify the source exists and belongs to the user
     source = await service.repo.get(
-        (Source.id == source_id) & 
-        (Source.user_id == x_user_id)
+        (Source.id == source_id) & (Source.user_id == x_user_id)
     )
     if not source:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Source not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source not found"
         )
-    
+
     try:
         return await service.update(
-            id=source_id,
-            data=data.model_dump(exclude_unset=True)
+            id=source_id, data=data.model_dump(exclude_unset=True)
         )
     except SQLAlchemyError as e:
         logger.error(f"Database error: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error"
         )
 
 
@@ -138,15 +121,13 @@ async def delete_source_route(
     source_id: UUID,
 ):
     source = await service.repo.get(
-        (Source.id == source_id) & 
-        (Source.user_id == x_user_id)
+        (Source.id == source_id) & (Source.user_id == x_user_id)
     )
     if not source:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Source not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source not found"
         )
-    
+
     await service.delete(id=source_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

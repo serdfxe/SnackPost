@@ -4,27 +4,33 @@ from pydantic import BaseModel, Field, field_validator
 from uuid import UUID
 from enum import Enum
 
+
 class SourceType(str, Enum):
     RSS = "rss"
     WEBSITE = "website"
+
 
 class SourceBaseDTO(BaseModel):
     url: str
     type: SourceType = Field(..., description="Тип источника")
 
-    @field_validator('url')
+    @field_validator("url")
     def normalize_url(cls, v):
         return str(v).lower().strip()
 
+
 class SourceCreateDTO(SourceBaseDTO):
     pass
+
 
 class SourceUpdateDTO(BaseModel):
     url: Optional[str] = Field(None, description="URL источника контента")
     type: Optional[SourceType] = Field(None, description="Тип источника")
 
+
 class SourceResponseDTO(SourceBaseDTO):
     id: UUID = Field(..., description="UUID источника")
+
 
 class ArticleResponseDTO(BaseModel):
     id: UUID = Field(..., description="ID статьи")

@@ -16,6 +16,7 @@ class DigestBase(BaseModel):
 class DigestSchema(DigestBase):
     id: UUID
 
+
 class ArticleSchema(BaseModel):
     id: UUID
     article_id: int
